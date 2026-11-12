@@ -1,0 +1,70 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: quickorder-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-quickorder}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-quickorder}
+      POSTGRES_DB: ${POSTGRES_DB:-quickorder}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-quickorder} -d ${POSTGRES_DB:-quickorder}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: quickorder-migrate
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-quickorder}:${POSTGRES_PASSWORD:-quickorder}@db:5432/${POSTGRES_DB:-quickorder}?schema=public
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminInitial123!}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-DemoInitial123!}
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
+    command: ["sh", "-c", "npx prisma migrate deploy && npm run prisma:seed"]
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: quickorder-server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      TZ: Asia/Bangkok
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-quickorder}:${POSTGRES_PASSWORD:-quickorder}@db:5432/${POSTGRES_DB:-quickorder}?schema=public
+    ports:
+      - "3000:3000"
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ""
+    container_name: quickorder-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,12 @@
+{
+  "name": "quickorder-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "test": "npm --prefix server test",
+    "start": "npm --prefix server start",
+    "dev": "npm --prefix server run dev"
+  }
+}

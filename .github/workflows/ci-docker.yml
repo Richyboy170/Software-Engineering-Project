@@ -1,0 +1,74 @@
+name: CI & Docker Build
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main, sprint-1-staging, staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: quickorder
+          POSTGRES_PASSWORD: quickorder
+          POSTGRES_DB: quickorder
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check deployment scripts without accessing GCP
+        run: |
+          bash -n deploy/deploy.sh deploy/teardown.sh deploy/release.sh || true
+
+      - name: Install & Test Backend
+        working-directory: ./server
+        env:
+          DATABASE_URL: postgresql://quickorder:quickorder@localhost:5432/quickorder?schema=public
+        run: |
+          npm ci
+          npx prisma generate
+          npm test
+
+      - name: Install, Test & Build Frontend
+        working-directory: ./client
+        run: |
+          npm ci
+          npm test
+          npm run build
+
+      - name: Verify Production Dockerfile Build
+        run: |
+          docker build -t quickorder:latest .

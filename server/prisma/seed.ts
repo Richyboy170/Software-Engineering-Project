@@ -21,6 +21,17 @@ async function main() {
     },
   });
 
+  const secondCustomer = await prisma.user.upsert({
+    where: { email: "customer2@quickorder.local" },
+    update: {},
+    create: {
+      email: "customer2@quickorder.local",
+      fullName: "Customer Two",
+      passwordHash,
+      role: "CUSTOMER",
+    },
+  });
+
   const staff = await prisma.user.upsert({
     where: { email: "staff@quickorder.local" },
     update: {},
@@ -32,7 +43,9 @@ async function main() {
     },
   });
 
-  console.log(`Seeded users: ${customer.email} (CUSTOMER), ${staff.email} (STAFF)`);
+  console.log(
+    `Seeded users: ${customer.email} (CUSTOMER), ${secondCustomer.email} (CUSTOMER), ${staff.email} (STAFF)`
+  );
 
   // Seed Menu Items
   const items = [

@@ -47,3 +47,19 @@
   Covers product hardening: Analytics dashboard (`FR-10`), structured audit logging, rate limiting, and final release tuning (`F-11`).
 - **Explicit Exclusions / Approved Deferrals:**  
   Third-party payment gateways and physical thermal printing hardware are excluded from product scope by architectural design decision. Simulated payment confirmations are utilized.
+
+## 3. Sprint 2 Persistence Foundation Traceability
+
+The persistence foundation in [Issue #4](https://github.com/Richyboy170/Software-Engineering-Project/issues/4) makes the existing F-01 through F-06 journey durable before Sprint 2 expansion work. The acceptance IDs below are defined in the [Sprint 2 persistence contract](./sprints/sprint-2/persistence-spec.md).
+
+| Acceptance ID | Source requirement / rule | Persistence behavior | Verification test |
+|---|---|---|---|
+| `AC-PERSIST-01` | F-01; test architecture constraint | Two apps can share the in-memory adapter without changing fixture-based tests. | `TEST-PERSIST-01` |
+| `AC-PERSIST-02` | NFR-06; Lab 5 C-05 | Migrations and idempotent seed provision the PostgreSQL demo fixtures. | `TEST-PERSIST-02` |
+| `AC-PERSIST-03` | FR-04; BR-03 | Order lines preserve the name and price captured at order time. | `TEST-PERSIST-03` |
+| `AC-PERSIST-04` | FR-01; FR-02; NFR-01 | Login, cross-instance session lookup, expiry, and logout revocation use PostgreSQL. | `TEST-PERSIST-04` |
+| `AC-PERSIST-05` | FR-03 | Menu reads return database-backed stock availability and numeric prices. | `TEST-PERSIST-05` |
+| `AC-PERSIST-06` | FR-04; BR-03 | Successful orders use database prices, persist across instances, and reserve stock once. | `TEST-PERSIST-06` |
+| `AC-PERSIST-07` | BR-01; BR-02; NFR-04 | Invalid, insufficient, duplicate-line, and final-unit race cases cannot partially write or oversell. | `TEST-PERSIST-07` |
+| `AC-PERSIST-08` | FR-05; FR-06; FR-07; BR-04; BR-05; BR-06 | Customer ownership and pending-only cancellation, one-time stock restoration, and staff-only forward status changes remain enforced. | `TEST-PERSIST-08` |
+| `AC-PERSIST-09` | NFR-06; Lab 5 readiness check | Readiness reflects database connectivity while liveness remains independent. | `TEST-PERSIST-09` |

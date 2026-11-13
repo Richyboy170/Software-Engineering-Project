@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { store, User, UserRole } from "../store.js";
+import type { QuickOrderPersistence } from "../persistence/contracts.js";
+import { asyncHandler } from "../http/async-handler.js";
+import { User, UserRole } from "../store.js";
 
 export interface AuthenticatedRequest extends Request {
   user?: User;
@@ -18,34 +20,36 @@ export function extractToken(req: Request): string | null {
   return null;
 }
 
-export function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction): void {
-  const token = extractToken(req);
-  if (!token) {
-    res.status(401).json({
-      success: false,
-      error: {
-        code: "UNAUTHORIZED",
-        message: "Authentication required. Please provide a valid session token.",
-      },
-    });
-    return;
-  }
+export function requireAuth(persistence: QuickOrderPersistence) {
+  return asyncHandler(async (req: AuthenticatedRequest, res, next) => {
+    const token = extractToken(req);
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: "UNAUTHORIZED",
+          message: "Authentication required. Please provide a valid session token.",
+        },
+      });
+      return;
+    }
 
-  const sessionData = store.getSession(token);
-  if (!sessionData) {
-    res.status(401).json({
-      success: false,
-      error: {
-        code: "INVALID_SESSION",
-        message: "Invalid or expired session token.",
-      },
-    });
-    return;
-  }
+    const sessionData = await persistence.getSession(token);
+    if (!sessionData) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: "INVALID_SESSION",
+          message: "Invalid or expired session token.",
+        },
+      });
+      return;
+    }
 
-  req.user = sessionData.user;
-  req.sessionToken = token;
-  next();
+    req.user = sessionData.user;
+    req.sessionToken = token;
+    next();
+  });
 }
 
 export function requireRole(...allowedRoles: UserRole[]) {

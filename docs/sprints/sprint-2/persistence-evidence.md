@@ -40,4 +40,6 @@ The frontend returned HTTP 200 at `http://127.0.0.1:5174/`. With PostgreSQL runn
 
 ## GitHub review gate
 
-The local suite and Compose checks are recorded above. The feature PR, GitHub Actions `test-and-docker` result, teammate review, and release PR remain pending; no remote CI or teammate peer-review result is claimed here. An independent pre-PR review was requested; its important and minor findings were addressed locally.
+The feature PR, [#5: feat: Persist QuickOrder state with Prisma](https://github.com/Richyboy170/Software-Engineering-Project/pull/5), is open against `sprint-1-staging`. GitHub Actions [`test-and-docker`](https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/43370453753/job/131704720807) passed.
+
+The documented teammate account `Tanakrit-triton` could not be requested: GitHub returned HTTP 422 because the account is not a repository collaborator. The repository collaborator list contains only `Richyboy170`. Teammate review and the release PR remain pending. Do not merge to `main` or deploy until the Lab 5 review gate and documented GCP target mismatch are resolved. The independent pre-PR review findings were addressed locally.

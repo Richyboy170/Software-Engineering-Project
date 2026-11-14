@@ -47,10 +47,10 @@ npm install
 cd server && npm install
 cd ../client && npm install
 
-# Run database migrations and seed
+# Generate the Prisma client, apply committed migrations, and seed
 cd server
 npx prisma generate
-npx prisma migrate dev
+npx prisma migrate deploy
 npm run prisma:seed
 
 # Start backend in watch mode (localhost:3000)
@@ -63,8 +63,13 @@ npm run dev
 
 ### 3.2 Running Automated Tests
 ```bash
-# Run backend test suite (unit, integration, and security checks)
+# Set DATABASE_URL to the PostgreSQL 16 test database, then migrate and seed it.
 cd server
+npx prisma generate
+npx prisma migrate deploy
+npm run prisma:seed
+
+# Run backend test suite (in-memory unit tests and PostgreSQL integration checks)
 npm test
 
 # Run frontend build check
@@ -75,6 +80,7 @@ npm run build
 ### 3.3 Running Locally with Docker Compose
 ```bash
 # Build and run Postgres, migration job, backend, and frontend
+# If port 5173 is occupied, set CLIENT_PORT=5174 before this command.
 docker compose up --build -d
 
 # Verify all containers are running and healthy
@@ -83,6 +89,12 @@ docker compose ps -a
 # Check API health
 curl.exe http://localhost:3000/api/health
 curl.exe http://localhost:3000/api/ready
+
+# Readiness should report 503 while PostgreSQL is stopped; health stays 200.
+docker compose stop db
+curl.exe -i http://localhost:3000/api/ready
+curl.exe -i http://localhost:3000/api/health
+docker compose start db
 
 # Tear down containers but keep database volume
 docker compose down

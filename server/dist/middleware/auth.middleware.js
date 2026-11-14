@@ -1,4 +1,4 @@
-import { store } from "../store.js";
+import { asyncHandler } from "../http/async-handler.js";
 export function extractToken(req) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -10,32 +10,34 @@ export function extractToken(req) {
     }
     return null;
 }
-export function requireAuth(req, res, next) {
-    const token = extractToken(req);
-    if (!token) {
-        res.status(401).json({
-            success: false,
-            error: {
-                code: "UNAUTHORIZED",
-                message: "Authentication required. Please provide a valid session token.",
-            },
-        });
-        return;
-    }
-    const sessionData = store.getSession(token);
-    if (!sessionData) {
-        res.status(401).json({
-            success: false,
-            error: {
-                code: "INVALID_SESSION",
-                message: "Invalid or expired session token.",
-            },
-        });
-        return;
-    }
-    req.user = sessionData.user;
-    req.sessionToken = token;
-    next();
+export function requireAuth(persistence) {
+    return asyncHandler(async (req, res, next) => {
+        const token = extractToken(req);
+        if (!token) {
+            res.status(401).json({
+                success: false,
+                error: {
+                    code: "UNAUTHORIZED",
+                    message: "Authentication required. Please provide a valid session token.",
+                },
+            });
+            return;
+        }
+        const sessionData = await persistence.getSession(token);
+        if (!sessionData) {
+            res.status(401).json({
+                success: false,
+                error: {
+                    code: "INVALID_SESSION",
+                    message: "Invalid or expired session token.",
+                },
+            });
+            return;
+        }
+        req.user = sessionData.user;
+        req.sessionToken = token;
+        next();
+    });
 }
 export function requireRole(...allowedRoles) {
     return (req, res, next) => {

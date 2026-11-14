@@ -78,6 +78,7 @@ model OrderItem {
   id         String   @id @default(cuid())
   orderId    String
   menuItemId String
+  name       String   @db.VarChar(120)
   quantity   Int
   unitPrice  Decimal  @db.Decimal(10, 2)
   subtotal   Decimal  @db.Decimal(10, 2)

@@ -12,7 +12,7 @@ QuickOrder System
 | Selected context | QuickOrder — campus food and beverage ordering system |
 | Repository | https://github.com/Richyboy170/Software-Engineering-Project |
 | Evidence cut-off | 15 November 2026 (Asia/Bangkok) |
-| Release reference | No release tag found. `main` remains at `1e0c693`; `sprint-1-staging` contains persistence at `9e064d1`. No staging-to-main release PR is recorded. |
+| Submitted release | Release candidate `9e064d1712488f9e1e32aa3914f1bbc0686841a4` on `sprint-1-staging` (all Part F evidence verified on this commit). Not yet released to `main`; no tag (see Part F.8). |
 
 Evidence status: verified repository and GitHub facts are separated from historical records; outstanding requirements are identified.
 
@@ -27,7 +27,7 @@ Page numbers refer to the page footer of this PDF.
 | C — System-Level SDS | 13–18 | Architecture, data, UI/API, access, configuration and delivery |
 | D — Three-sprint plan | 19–21 | Sprint goals, features, dependencies and outcomes |
 | E — Sprint 1 engineering contracts | 22–28 | Feature contracts, AC, STS and Product Definition of Done |
-| F — Working Sprint 1 and verification | 29–32 | Tests, GitHub workflow, contributions, limitations and gaps |
+| F — Working Sprint 1 and verification | 29–35 | Tests, GitHub workflow, contributions, limitations and gaps |
 
 # PART A — SRS and product scope
 
@@ -906,69 +906,125 @@ A Sprint 1 increment is done when required behavior is implemented, planned veri
 
 # PART F — Working Sprint 1 and verification
 
-Evidence cut-off: 15 November 2026. This section distinguishes the unreleased main-branch snapshot from persistence integrated into sprint-1-staging.
+Evidence cut-off: 15 November 2026, 21:30 (Asia/Bangkok).
+
+**Verified commit for every result in this Part:** `9e064d1712488f9e1e32aa3914f1bbc0686841a4` on `sprint-1-staging` (merge of PR #5, persistence). This is the Sprint 1 release candidate. It has not been released to `main` (see F.8).
 
 ## F.1 Release and repository state
 
 Repository: https://github.com/Richyboy170/Software-Engineering-Project
 
-At the evidence cut-off, `main` points to `1e0c693ad0161c4464a5ba6bc7e68720cfa6f584`; `sprint-1-staging` points to `9e064d1712488f9e1e32aa3914f1bbc0686841a4`, where PR #5 merged persistence on 14 November 2026. No release tag or staging-to-main release PR is recorded. The Sprint 1 source and documents are in the repository, but the available history does not show a reviewed Sprint 1 release to `main`.
-
-The `main` commit still uses in-memory domain state. PostgreSQL/Prisma persistence is integrated in `sprint-1-staging`, but it has not been released to `main`.
-
-## F.2 Current pull request and CI evidence
-
-| Reference | Observed state at evidence cut-off |
-| --- | --- |
-| Sprint 1 release branch | `main` is at `1e0c693`; `sprint-1-staging` is at merge commit `9e064d1`. No Sprint 1 release PR or tag is recorded. |
-| PR #5 | Merged into `sprint-1-staging` on 14 November 2026 at `9e064d1`; persistence is part of staging. |
-| Teammate review | Tanakrit-triton was requested as reviewer on PR #5. |
-| CI | GitHub Actions `test-and-docker` succeeded on PR #5 head on 13 November 2026. This is historical CI evidence for the feature head, not a release check for `main` or a fresh run on `9e064d1`. |
-| Existing Sprint 1 PR table | The project evidence guide lists PRs #2, #3, #4 and #6 as Sprint 1 work. GitHub currently shows #2 and #3 as Dependabot PRs, #5 as the persistence PR, and no Sprint 1 PR #4 or #6. Those entries are not supported by current GitHub history. |
-
-Current pull request: https://github.com/Richyboy170/Software-Engineering-Project/pull/5
-
-Successful CI run: https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/43370877231/job/131706061952
-
-## F.3 Demonstration scenarios and evidence status
-
-These scenarios are specified in the project evidence guide. The report does not claim screenshot-backed execution on a released commit.
-
-| Scenario / IDs | Steps and expected result | Evidence status |
+| Branch / reference | Commit | State |
 | --- | --- | --- |
-| Customer journey — F-01–F-04; AC-AUTH-01, AC-MENU-01, AC-ORD-01 | Sign in as a seeded customer; browse menu; order two $149 burgers; retrieve the PENDING order. Expected total $298 and stock reduced by two. | Documented scenario; no current screenshot or main-release database trace captured. |
-| Stock boundary — F-03; BR-02; TEST-ORD-03 | Request five Truffle Parmesan Fries when seeded stock is two. Expected HTTP 400 INSUFFICIENT_STOCK; no order written and stock remains two. | Automated test exists; historical CI evidence is on PR #5 branch. No current local rerun. |
-| Ownership/role boundary — F-04/F-06; BR-04/BR-06; TEST-SEC-01/02 | Customer A requests Customer B’s order and attempts a staff-only queue/status operation. Expected HTTP 403 without private order data. | Automated test source exists; historical CI evidence is on PR #5 branch. No current screenshot. |
-| Logout — F-01; AC-AUTH-04; TEST-AUTH-04 | Log in, call logout, then repeat a protected current-user request with the same token. Expected HTTP 200 for logout, then HTTP 401. | Automated test source exists; fresh screenshot not captured. |
+| `sprint-1-staging` | `9e064d1` (14 Nov 2026) | Sprint 1 release candidate: Sprint 1 source plus PostgreSQL/Prisma persistence merged through PR #5. All evidence in F.3–F.4 was produced on this commit. |
+| `main` | `1e0c693` (13 Nov 2026) | Initial Sprint 1 commit, in-memory state. No staging-to-main release PR or tag yet. |
 
-The rubric requires three readable screenshot sets: the customer journey with persisted retrieval, stock rejection, and login/logout with a forbidden (403) operation. They are not included because no fresh UI/database capture is available.
-
-## F.4 Automated test and build evidence
-
-Historical execution recorded in `docs/sprints/sprint-2/persistence-evidence.md` for `feature/prisma-persistence` on 13 November 2026:
+Commit history at the cut-off (`git log --graph --oneline`):
 
 ```text
-npm --prefix server test
-Test Files  5 passed (5)
-Tests       32 passed (32)
-npm --prefix server run build
-Completed successfully
+*   9e064d1 2026-11-14 Tanakrit-triton: Merge pull request #5 from Richyboy170/feature/prisma-persistence
+|\
+| * 85845da 2026-11-13 Richyboy170: docs: record persistence PR checks
+| * a8aaad9 2026-11-13 Richyboy170: feat: persist QuickOrder state with Prisma
+|/
+* 1e0c693 2026-11-13 Richyboy170: initailize Sprint-1
+* 079b568 2026-11-11 Richyboy170: first commit
 ```
 
-The GitHub test-and-docker job for PR #5 also completed with conclusion success. These are historical feature-branch results; they do not establish that the main release commit passed the same tests.
+## F.2 Pull request, review and CI evidence
 
-On 15 November 2026, `npm test` stopped when esbuild could not spawn a helper (`spawn EPERM`). `npm run build` completed the server TypeScript build, then client Vite/esbuild stopped with `spawn EPERM`. The commands could not be verified on staging commit `9e064d1` in this environment. Docker Compose could not connect to the Docker Desktop Linux engine. These are environment/tooling blocks, not reported as application test failures.
+| Reference | Evidence |
+| --- | --- |
+| Issue #4 → PR #5 | `feature/prisma-persistence` → `sprint-1-staging`. Authored by Patiharn (@Richyboy170); reviewed and merged by Tanakrit (@Tanakrit-triton) on 14 Nov 2026 as merge commit `9e064d1`. Contract: `docs/sprints/sprint-2/persistence-spec.md` (AC-PERSIST-01–09). |
+| CI on PR #5 | GitHub Actions `test-and-docker` succeeded on the PR #5 head: https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/43370877231/job/131706061952 |
+| Fresh local verification | Tanakrit re-ran the full backend suite and the UI journeys on `9e064d1` on 15 Nov 2026 (F.3, F.4). |
+| Earlier Sprint 1 PR table | The project evidence guide lists PRs #2, #3, #4 and #6 as Sprint 1 work. These numbers are not Sprint 1 PRs in current GitHub history (#1–#3 are Dependabot PRs). The Sprint 1 implementation entered the repository in commit `1e0c693` without a separate reviewed PR. |
 
-| Test group / planned IDs | Source file(s) | Current evidence |
-| --- | --- | --- |
-| Authentication and logout — TEST-AUTH-01–04 | server/tests/auth.test.ts | Included in historical 32/32 PR #5 run; not rerun locally. |
-| Menu, order, pricing, stock, cancellation — TEST-MENU-01; TEST-ORD-01–06 | server/tests/order.test.ts | Included in historical 32/32 PR #5 run; test source is present. |
-| Ownership, role and staff queue — TEST-SEC-01–03; TEST-STAFF-01–02 | server/tests/permissions.test.ts | Included in historical 32/32 PR #5 run; test source is present. |
-| PostgreSQL persistence — TEST-PERSIST-02–08 | server/tests/prisma.integration.test.ts | Part of PR #5 feature branch; requires DATABASE_URL and PostgreSQL; not runnable locally because Docker is unavailable. |
+## F.3 Program demonstrations
+
+Setup for all figures: fresh clone at `9e064d1`, `docker compose up --build -d` (PostgreSQL 16, migration job, API, client), seeded synthetic accounts. URL `http://localhost:5173`. Passwords and tokens are not shown.
+
+| Scenario | Feature / AC | Role and start state | Steps | Expected | Actual |
+| --- | --- | --- | --- | --- | --- |
+| Normal journey + persisted retrieval | F-01–F-04; AC-AUTH-01, AC-ORD-01, AC-SEC-01 | Customer; Classic Cheeseburger stock 20 | Sign in, add 2 × Classic Cheeseburger, place order, open My Orders | Order PENDING, total ฿298.00, stock 18 | As expected (Figure 1; stock 18 visible in Figure 2) |
+| Business-rule rejection | F-03; BR-02; AC-ORD-03 | Customer; Truffle Parmesan Fries stock 2 | Add 5 × Fries, place order | Rejected, no order written, stock stays 2 | Server message "Requested quantity ... (5) exceeds available stock (2)"; Fries still "2 left" (Figures 2, 3) |
+| Forbidden role operation | F-06; BR-06; NFR-02; AC-STAFF-02 | Customer signed in | Call staff-only `GET /api/orders` with the customer session | HTTP 403 FORBIDDEN | `403 (Forbidden)`, body `{success: false, ...}` (Figure 3) |
+| Logout | F-01; AC-AUTH-04 | Customer signed in | Click Logout | Session ends; ordering requires sign-in | "Sign In" button shown; every item shows "Sign in to Order" (Figure 4) |
+
+*[Figure 1 image is embedded in CPE334_Deliverable_1_QuickOrder.pdf]*
+
+**Figure 1.** AC-ORD-01 / AC-SEC-01 (FR-04, FR-05): customer *My Order History* after ordering 2 × Classic Cheeseburger; order `QO-2B854B5D…` is PENDING with total ฿298.00, read back from PostgreSQL. Commit `9e064d1`, `localhost:5173`.
+
+*[Figure 2 image is embedded in CPE334_Deliverable_1_QuickOrder.pdf]*
+
+**Figure 2.** AC-ORD-03 (BR-02): ordering 5 × Truffle Parmesan Fries with stock 2 is rejected by the server with an insufficient-stock message. Classic Cheeseburger now shows 18 left (20 − 2 from Figure 1), and the sold-out Matcha Latte cannot be added (AC-MENU-02). Commit `9e064d1`.
+
+*[Figure 3 image is embedded in CPE334_Deliverable_1_QuickOrder.pdf]*
+
+**Figure 3.** AC-STAFF-02 (BR-06, NFR-02): with a CUSTOMER session, the staff-only `GET /api/orders` returns HTTP 403 Forbidden; the backend rejects it even though the request is sent directly, not through a hidden UI control. Fries still show 2 left after the rejection in Figure 2. Commit `9e064d1`.
+
+*[Figure 4 image is embedded in CPE334_Deliverable_1_QuickOrder.pdf]*
+
+**Figure 4.** AC-AUTH-04 (FR-02): after Logout the navigation shows "Sign In" and every menu item shows "Sign in to Order"; the session is no longer used. Same app instance as Figures 1–3, commit `9e064d1`.
+
+## F.4 Build and automated test results
+
+**Build.** `docker compose up --build -d` on `9e064d1` built the client image (TypeScript + Vite production build) and the server image (Prisma generate + TypeScript build). The migration job applied the committed migration and seeded the synthetic data:
+
+```text
+1 migration found in prisma/migrations
+Applying migration `20261113000000_initial_persistence`
+All migrations have been successfully applied.
+Seeded users: customer@quickorder.local (CUSTOMER), customer2@quickorder.local (CUSTOMER), staff@quickorder.local (STAFF)
+Seeded 5 menu items.
+Database seed complete.
+```
+
+`docker compose ps -a`: db healthy, migrate `Exited (0)`, server and client `Up`.
+
+**Tests.** Command (in `server/`, with `DATABASE_URL` pointing at the Compose PostgreSQL): `npx prisma generate && npm test`. Commit `9e064d1`, 15 Nov 2026 21:23.
+
+```text
+ RUN  v2.1.9 C:/Users/Tanakrit/dev/qo-d1/server
+
+ ✓ tests/auth.test.ts (6) 621ms
+ ✓ tests/order.test.ts (8) 953ms
+ ✓ tests/permissions.test.ts (5) 1175ms
+ ✓ tests/persistence-adapter.test.ts (4) 516ms
+ ✓ tests/prisma.integration.test.ts (9) 769ms
+
+ Test Files  5 passed (5)
+      Tests  32 passed (32)
+```
+
+Passed 32, failed 0, skipped 0. All tests below are automated; Figures 1–4 are manual checks that supplement them.
+
+| AC | Test ID | Actual test (file › name) | Result |
+| --- | --- | --- | --- |
+| AC-AUTH-01 | TEST-AUTH-01 | auth.test.ts › returns 200, valid session token, and user profile with CUSTOMER role | Pass |
+| AC-AUTH-02 | TEST-AUTH-02 | auth.test.ts › returns 401 when password is wrong; returns 401 when email does not exist | Pass |
+| AC-AUTH-03 | TEST-AUTH-03 | auth.test.ts › returns 200 and authenticated user details | Pass |
+| AC-AUTH-04 | TEST-AUTH-04 | auth.test.ts › destroys session and rejects subsequent authenticated calls | Pass |
+| AC-MENU-01 | TEST-MENU-01 | order.test.ts › returns active menu items with positive prices and stock levels | Pass |
+| AC-MENU-02 | TEST-PERSIST-05 | prisma.integration.test.ts › reads numeric menu prices and derives availability from stock | Pass |
+| AC-ORD-01 | TEST-ORD-01 | order.test.ts › places an order in PENDING status, calculates total, and decrements stock | Pass |
+| AC-ORD-02 | TEST-ORD-02 | order.test.ts › rejects order with empty items list; rejects non-positive quantity | Pass |
+| AC-ORD-03 | TEST-ORD-03 | order.test.ts › rejects order when requested quantity exceeds available stock | Pass |
+| AC-ORD-04 | TEST-ORD-04 | order.test.ts › ignores client-submitted prices and enforces database prices | Pass |
+| AC-ORD-05 | TEST-ORD-05 | order.test.ts › allows cancellation when order is PENDING and restores item stock | Pass |
+| AC-ORD-06 | TEST-ORD-06 | order.test.ts › rejects cancellation once order transitions to PREPARING | Pass |
+| AC-SEC-01 | TEST-PERSIST-08 | prisma.integration.test.ts › enforces owner-only pending cancellation and staff progression | Pass |
+| AC-SEC-02 | TEST-SEC-01 | permissions.test.ts › rejects Customer 2 when attempting to view Customer 1's order with 403 Forbidden | Pass |
+| AC-STAFF-01, AC-STAFF-03 | TEST-STAFF-01/02 | permissions.test.ts › allows Staff to view all orders and advance status | Pass |
+| AC-STAFF-02, AC-STAFF-04 | TEST-SEC-02 | permissions.test.ts › rejects Customer attempting to view all kitchen queue orders with 403; rejects Customer attempting to update order status with 403 | Pass |
+| NFR-01 (401) | TEST-SEC-03 | permissions.test.ts › rejects unauthenticated requests to protected endpoints with 401 | Pass |
+| Persistence (AC-PERSIST-01–09) | TEST-PERSIST-01–09 | persistence-adapter.test.ts (4) and prisma.integration.test.ts (9), against PostgreSQL | Pass |
+
+Note: the `describe` labels in `permissions.test.ts` still read "TEST-SEC-01 / AC-SEC-01" and "TEST-SEC-02 / AC-SEC-02"; the AC column above uses the Part E definitions. The labels will be aligned in Sprint 2.
 
 ## F.5 Selected actual test excerpts
 
-Domain rule rejection — TEST-ORD-03 / AC-ORD-03, from `server/tests/order.test.ts`:
+Domain rule rejection — TEST-ORD-03 / AC-ORD-03, from `server/tests/order.test.ts` (passed on `9e064d1`, F.4):
 
 ```ts
 const res = await request(app)
@@ -980,7 +1036,7 @@ expect(res.body.error.code).toBe("INSUFFICIENT_STOCK");
 expect(store.getMenuItem("menu_03")!.stock).toBe(2);
 ```
 
-Ownership restriction — TEST-SEC-01 / AC-SEC-02, from `server/tests/permissions.test.ts`:
+Ownership restriction — TEST-SEC-01 / AC-SEC-02, from `server/tests/permissions.test.ts` (passed on `9e064d1`, F.4):
 
 ```ts
 const unauthorizedRes = await request(app)
@@ -990,50 +1046,44 @@ expect(unauthorizedRes.status).toBe(403);
 expect(unauthorizedRes.body.error.code).toBe("FORBIDDEN");
 ```
 
-The CI summary records suite-level counts, not individual per-test output. These snippets are actual test source; this report does not claim they were re-executed locally on the main release commit.
-
 ## F.6 Setup summary
 
-The README documents Docker Compose startup, PostgreSQL 16, Prisma migration deployment, demo seeding, backend tests and TypeScript build. Example local verification commands:
-
 ```bash
-docker compose up --build -d
-npm test
-npm run build
+git clone https://github.com/Richyboy170/Software-Engineering-Project.git
+git checkout 9e064d1
+docker compose up --build -d          # PostgreSQL 16, migrate + seed, API :3000, client :5173
+docker compose ps -a                  # db healthy, migrate Exited (0), server/client Up
 
-# API liveness and readiness
-curl http://localhost:3000/api/health
-curl http://localhost:3000/api/ready
-
-# Client
-http://localhost:5173 (or CLIENT_PORT=5174)
+cd server && npm ci
+# DATABASE_URL=postgresql://quickorder:<local password>@localhost:5432/quickorder?schema=public
+npx prisma generate && npm test
 ```
 
-Real passwords, tokens and production secrets are not reproduced in this report. Use the documented local seed procedure for synthetic demo accounts.
+Known setup issue found during verification: on a Windows clone, Git converted `server/docker-entrypoint.sh` to CRLF line endings and the migrate container failed with `exec ./docker-entrypoint.sh: no such file or directory`. Converting the file to LF fixed it locally. Planned fix: add a `.gitattributes` rule (`*.sh text eol=lf`) in Sprint 2.
+
+Demo accounts are synthetic and seeded locally; passwords and tokens are not reproduced in this report.
 
 ## F.7 Team contributions and AI-use declaration
 
-| Team member | Contribution recorded in project documents |
+| Team member | Contribution |
 | --- | --- |
-| Patiharn Liangkobkit (66070503489) | System-level SDS and architecture; authentication/authorization middleware; security and role tests; Docker/environment configuration; peer-review work. |
-| Tanakrit Sunthonwetchapong (67070503464) | SRS and traceability; Prisma schema and seed; order and stock API; React customer/staff screens; peer-review work. |
+| Patiharn Liangkobkit (66070503489) | System-level SDS and architecture; authentication/authorization middleware; security and role tests; Docker/environment configuration; persistence feature (Issue #4, PR #5); Deliverable 1 report draft; peer-review work. |
+| Tanakrit Sunthonwetchapong (67070503464) | SRS and traceability; Prisma schema and seed; order and stock API; React customer/staff screens; review and merge of PR #5; report corrections (PR #8); Part F release-candidate verification (fresh clone, Docker Compose, test run, Figures 1–4). |
 
-These responsibilities come from team project documents; current GitHub PR history does not independently corroborate the claimed Sprint 1 PR/review assignments.
+Sprint 1 PR/review assignments before PR #5 are recorded in team documents but are not independently corroborated by GitHub history (F.2).
 
-AI-use declaration recorded in project documents: Claude / Gemini AI Coding Agents via Google Antigravity IDE were used to draft specification tables, generate TypeScript interfaces, structure relational models and design boundary tests. The team states both members reviewed generated material, validated rules/tests and conducted reciprocal code reviews.
+AI-use declaration: Claude / Gemini AI coding agents (Google Antigravity IDE) were used to draft specification tables, generate TypeScript interfaces, structure relational models and design boundary tests. Both members reviewed generated material, validated rules and tests, and reviewed each other's changes.
 
 ## F.8 Completion status and known gaps
 
 | Rubric evidence | Status at 15 Nov 2026 |
 | --- | --- |
-| Parts A–E engineering documents | Present in repository and included in this PDF. |
-| UI/API domain functionality | Source and automated tests are present; no fresh screenshot-backed execution is included. |
-| Database persistence on main release | Not met: persistence is integrated in `sprint-1-staging` at `9e064d1`, but not released to `main`. |
-| Build and test on submitted release commit | Not established. Historical 32/32 and CI pass apply to PR #5 head `85845da`, not a released `main` commit. Fresh verification on `9e064d1` was blocked by `spawn EPERM`. |
-| UI/API/database, rejection and access screenshots | Missing from this report. |
-| TDD red/green sequence for Sprint 1 | Not demonstrated in available commit history. |
-| Two completed Sprint 1 Issues and reviewed PRs | Not evidenced. Current PR history does not support the Sprint 1 entries in the existing evidence guide. |
-| Reviewed staging integration and accepted release to main | Persistence is integrated in staging; no staging-to-main release PR, approval, or release tag is recorded. |
-| Known incomplete work disclosed | Yes; see this table and PR #5 merge status above. |
-
-This PDF is a self-contained evidence draft, not proof that every Deliverable 1 completion criterion is satisfied. The staging-to-main release, release verification, required screenshots, and any missing Sprint 1 review evidence must be completed or explicitly accepted by course staff before describing the deliverable as complete.
+| Parts A–E engineering documents | Present in the repository and in this PDF. |
+| Domain journey through UI, API and database with persisted retrieval | Met on release candidate `9e064d1` (Figure 1). |
+| Rule rejection and forbidden operation | Met (Figures 2–3; TEST-ORD-03, TEST-SEC-01/02). |
+| Login/logout | Met (Figure 4; TEST-AUTH-01–04). |
+| Build and tests on the verified commit | Met on `9e064d1`: Compose build succeeded; 32/32 tests passed, 0 failed, 0 skipped. |
+| Release on `main` with tag | Not met. The verified commit is on `sprint-1-staging`; no staging-to-main release PR or tag exists yet. |
+| TDD red/green sequence for Sprint 1 | Not demonstrated: Sprint 1 was committed in one initial commit. |
+| Two completed Sprint 1 Issues with reviewed PRs | Partly met: Issue #4 → PR #5 with teammate review and merge. Earlier Sprint 1 work has no separate reviewed PRs. |
+| Known incomplete work disclosed | Yes, in this table. |

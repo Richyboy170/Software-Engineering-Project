@@ -8,7 +8,8 @@ QuickOrder System
 | --- | --- |
 | Team member 1 | Patiharn Liangkobkit — Student ID 66070503489 — @Richyboy170 |
 | Team member 2 | Tanakrit Sunthonwetchapong — Student ID 67070503464 — @Tanakrit-triton |
-| Selected context | QuickOrder food-ordering system |
+| Assigned theme | E-commerce or Ordering System |
+| Selected context | QuickOrder — campus food and beverage ordering system |
 | Repository | https://github.com/Richyboy170/Software-Engineering-Project |
 | Evidence cut-off | 15 November 2026 (Asia/Bangkok) |
 | Release reference | No release tag found. `main` remains at `1e0c693`; `sprint-1-staging` contains persistence at `9e064d1`. No staging-to-main release PR is recorded. |
@@ -17,16 +18,16 @@ Evidence status: verified repository and GitHub facts are separated from histori
 
 # Contents and navigation
 
-The parts below identify the requirements and contracts covered in each section.
+Page numbers refer to the page footer of this PDF.
 
-| Part | Contents / IDs |
-| --- | --- |
-| A — SRS and product scope | Actors, scope, FR/BR/NFR, assumptions and decisions |
-| B — Feature inventory and traceability | F-01–F-11; FR/BR/NFR mapping |
-| C — System-Level SDS | Architecture, data, UI/API, access, configuration and delivery |
-| D — Three-sprint plan | Sprint goals, features, dependencies and outcomes |
-| E — Sprint 1 engineering contracts | Feature contracts, AC, STS and Product Definition of Done |
-| F — Working Sprint 1 and verification | Tests, GitHub workflow, contributions, limitations and gaps |
+| Part | Pages | Contents / IDs |
+| --- | --- | --- |
+| A — SRS and product scope | 2–6 | Actors, scope, FR/BR/NFR, assumptions and decisions |
+| B — Feature inventory and traceability | 7–12 | F-01–F-11; FR/BR/NFR mapping |
+| C — System-Level SDS | 13–18 | Architecture, data, UI/API, access, configuration and delivery |
+| D — Three-sprint plan | 19–21 | Sprint goals, features, dependencies and outcomes |
+| E — Sprint 1 engineering contracts | 22–28 | Feature contracts, AC, STS and Product Definition of Done |
+| F — Working Sprint 1 and verification | 29–32 | Tests, GitHub workflow, contributions, limitations and gaps |
 
 # PART A — SRS and product scope
 
@@ -46,7 +47,9 @@ Tanakrit Sunthonwetchapong (Student ID: 67070503464, GitHub: @Tanakrit-triton (h
 
 Repository: Richyboy170/Software-Engineering-Project (https://github.com/Richyboy170/Software-Engineering-Project)  
 
-Theme/Domain: QuickOrder (On-Demand Food & Beverage Ordering Platform)
+Theme: E-commerce or Ordering System  
+
+Selected context: QuickOrder (On-Demand Food & Beverage Ordering Platform)
 
 ### 1. Context and Stakeholder Problem
 
@@ -134,7 +137,7 @@ Self-service email verification links and SMS password resets (synthetic seeded 
 | --- | --- | --- | --- | --- |
 | NFR-01 | Security / Access Control | Unauthenticated requests to protected endpoints (/api/orders/, /api/auth/me) are rejected with HTTP 401 Unauthorized without leaking private record data. | Automated Supertest API security suite. | Sprint 1 |
 | NFR-02 | Security / Role Restriction | Customer role users attempting Staff-only endpoints (/api/orders/:id/status, menu item mutations) are rejected with HTTP 403 Forbidden. | Automated Supertest API role boundary tests. | Sprint 1 |
-| NFR-03 | Performance / Response Time | API endpoints for menu listing and order submission must respond within <= 200 ms under local automated test suites. | Supertest API benchmark test. | Sprint 1 |
+| NFR-03 | Performance / Response Time | API endpoints for menu listing and order submission must respond within <= 200 ms under local automated test suites. | Supertest API benchmark test. | Sprint 2 (approved change, see Part B Section 2) |
 | NFR-04 | Data Integrity & Concurrency | Simultaneous order requests competing for the last unit of stock must not oversell inventory (zero negative stock tolerance). | Concurrency race condition test with transactional lock. | Sprint 2 |
 | NFR-05 | Cloud Readiness & Portability | Application runs from a clean container build; configuration injected exclusively via environment variables without hardcoded secrets. | Docker fresh build verification in GitHub Actions CI (test-and-docker). | Sprint 1 / Lab 5 |
 | NFR-06 | Disaster Recovery & Persistence | All committed order and inventory records survive container restarts and Cloud Run redeployments. | Post-restart database retrieval test (Lab 5 verification C-05). | Lab 5 |
@@ -233,7 +236,7 @@ Domain: QuickOrder System
 | BR-06 | BR | Only Staff May Promote Status | F-06 Staff Kitchen Queue | Sprint 1 | AC-STAFF-04 / TEST-SEC-02 (Role Permission Test) |
 | NFR-01 | NFR | Protected Endpoints Reject Unauth (401) | System Responsibility: Auth Middleware | Sprint 1 | AC-AUTH-04 / TEST-AUTH-04 (Revoked-token request returns 401) |
 | NFR-02 | NFR | Customer Forbidden on Staff Endpoints (403) | System Responsibility: Role Middleware | Sprint 1 | AC-STAFF-02 / TEST-SEC-02 (Supertest API Security) |
-| NFR-03 | NFR | Response Time at Most 200 ms | System Responsibility: API Layer | Sprint 1 | TEST-PERF-01 (performance target; no AC defined in Part E) |
+| NFR-03 | NFR | Response Time at Most 200 ms | System Responsibility: API Layer | Sprint 2 | Deferred: TEST-PERF-01 to be specified in the Sprint 2 contract (approved change) |
 | NFR-04 | NFR | Zero Negative Stock Tolerance | F-09 Concurrency Locking | Sprint 2 | Concurrency Test Suite |
 | NFR-05 | NFR | Container Packaging & Zero Hardcoded Secrets | System Responsibility: DevOps / Docker | Sprint 1 / Lab 5 | GitHub Actions CI test-and-docker |
 | NFR-06 | NFR | Data Persistence across Container Restart | System Responsibility: Cloud SQL / Storage | Lab 5 | Lab 5 Verification Check C-05 |
@@ -242,17 +245,20 @@ Domain: QuickOrder System
 
 Sprint 1 Coverage:  
 
-  Covers 100% of foundational requirements: Authentication (FR-01, FR-02), Menu Catalog (FR-03), Order Submission & Retrieval (FR-04, FR-05), Staff Queue (FR-06), Order Cancellation (FR-07), all core Business Rules (BR-01 to BR-06), and baseline security/performance NFRs (NFR-01, NFR-02, NFR-03, NFR-05).
+  Covers 100% of foundational requirements: Authentication (FR-01, FR-02), Menu Catalog (FR-03), Order Submission & Retrieval (FR-04, FR-05), Staff Queue (FR-06), Order Cancellation (FR-07), all core Business Rules (BR-01 to BR-06), and baseline security and portability NFRs (NFR-01, NFR-02, NFR-05).
 
 Sprint 2 Coverage:  
 
-  Covers expansion features: Staff-side menu editing/restocking (FR-08), printable digital receipt (FR-09), and high-concurrency race condition testing (NFR-04).
+  Covers expansion features: Staff-side menu editing/restocking (FR-08), printable digital receipt (FR-09), high-concurrency race condition testing (NFR-04), and the response-time benchmark (NFR-03).
 
 Sprint 3 Coverage:  
 
   Covers product hardening: Analytics dashboard (FR-10), structured audit logging, rate limiting, and final release tuning (F-11).
 
 Explicit Exclusions / Approved Deferrals:  
+
+Approved change (15 November 2026): NFR-03 (response time at most 200 ms) moved from Sprint 1 to Sprint 2. Sprint 1 has no benchmark test (TEST-PERF-01 does not exist in the STS or server/tests), so claiming Sprint 1 coverage would be unsupported. TEST-PERF-01 and its AC will be specified in the Sprint 2 contract.
+
 
   Third-party payment gateways and physical thermal printing hardware are excluded from product scope by architectural design decision. Simulated payment confirmations are utilized.
 
@@ -286,7 +292,7 @@ Patiharn Liangkobkit (66070503489, GitHub: @Richyboy170 (https://github.com/Rich
 
 Tanakrit Sunthonwetchapong (67070503464, GitHub: @Tanakrit-triton (https://github.com/Tanakrit-triton))  
 
-Theme/Domain: QuickOrder Ordering Platform  
+Theme: E-commerce or Ordering System; context: QuickOrder Ordering Platform  
 
 Target Checkpoint: Deliverable 1 (8 November 2026) / Lab 5 CI/CD Ready
 
@@ -325,7 +331,58 @@ Fail-Safe Rollback: If any item exceeds stock, the transaction immediately abort
 
 #### 2.1 Entity Relationship Diagram
 
-erDiagram    USER ||--o{ SESSION : has    USER ||--o{ ORDER : places    ORDER ||--|{ ORDER_ITEM : contains    MENU_ITEM ||--o{ ORDER_ITEM : referenced_by    USER {        string id PK        string email UK        string passwordHash        string fullName        string role "CUSTOMER | STAFF"        datetime createdAt        datetime updatedAt    }    SESSION {        string token PK        string userId FK        datetime expiresAt        datetime createdAt    }    MENU_ITEM {        string id PK        string name        string description        string category        decimal price        int stock        boolean isAvailable        datetime createdAt        datetime updatedAt    }    ORDER {        string id PK        string customerId FK        string status "PENDING | PREPARING | READY | COMPLETED | CANCELLED"        decimal totalPrice        datetime createdAt        datetime updatedAt    }    ORDER_ITEM {        string id PK        string orderId FK        string menuItemId FK        int quantity        decimal unitPrice        decimal subtotal    }
+```mermaid
+erDiagram
+    USER ||--o{ SESSION : has
+    USER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    MENU_ITEM ||--o{ ORDER_ITEM : referenced_by
+    USER {
+    string id PK
+    string email UK
+    string passwordHash
+    string fullName
+    string role "CUSTOMER | STAFF"
+    datetime createdAt
+    datetime updatedAt
+    }
+    SESSION {
+    string id PK
+    string token UK
+    string userId FK
+    datetime expiresAt
+    datetime createdAt
+    }
+    MENU_ITEM {
+    string id PK
+    string name
+    string description
+    string category
+    decimal price
+    int stock
+    boolean isAvailable
+    datetime createdAt
+    datetime updatedAt
+    }
+    ORDER {
+    string id PK
+    string orderNumber UK
+    string customerId FK
+    string status "PENDING | PREPARING | READY | COMPLETED | CANCELLED"
+    decimal totalPrice
+    datetime createdAt
+    datetime updatedAt
+    }
+    ORDER_ITEM {
+    string id PK
+    string orderId FK
+    string menuItemId FK
+    string name "snapshot"
+    int quantity
+    decimal unitPrice
+    decimal subtotal
+    }
+```
 
 #### 2.2 Data Dictionary and Key Constraints
 
@@ -367,7 +424,7 @@ customerId: Foreign key to User.id.
 
 status: Enum (PENDING, PREPARING, READY, COMPLETED, CANCELLED).
 
-totalPrice: Decimal $(10, 2)$, sum of all line item subtotals calculated server-side.
+totalPrice: Decimal(10, 2), sum of all line item subtotals calculated server-side.
 
 OrderItem Table:
 
@@ -379,7 +436,7 @@ quantity: Integer >= 1.
 
 unitPrice: Snapshot of MenuItem.price at moment of purchase.
 
-subtotal: quantity $\times$ unitPrice.
+subtotal: quantity × unitPrice.
 
 ### 3. UI, API, and Access Conventions
 
@@ -507,7 +564,7 @@ Domain: QuickOrder System
 | Sprint | Objective & Milestone | Target Checkpoint | Feature IDs | Primary Completion Outcome |
 | --- | --- | --- | --- | --- |
 | Sprint 1 | Foundational Vertical Slice & Core Rules: Authentication, Menu Catalog, Order Placement, Kitchen Queue, Status Progression, and Strict Business Rules. | Deliverable 1 (8 Nov 2026) | F-01, F-02, F-03, F-04, F-05, F-06 | Working end-to-end user journey across UI, API, and DB with automated tests, reproducible seed data, and reviewed Git integration. |
-| Sprint 2 | Core Expansion & Cloud Pipeline: Staff Menu/Stock Management, Digital Receipts/Pickup Codes, High-Concurrency Locking, and GCP Cloud Deployment with CI/CD quality gate. | Deliverable 2 / Lab 5 (15 Nov - 29 Nov 2026) | F-07, F-08, F-09, NFR-04, NFR-05, NFR-06 | Live GCP deployment on Cloud Run + Cloud SQL; PR merge gate with automated test checks; repeatable release pipeline. |
+| Sprint 2 | Core Expansion & Cloud Pipeline: Staff Menu/Stock Management, Digital Receipts/Pickup Codes, High-Concurrency Locking, and GCP Cloud Deployment with CI/CD quality gate. | Deliverable 2 / Lab 5 (15 Nov - 29 Nov 2026) | F-07, F-08, F-09, NFR-03, NFR-04, NFR-05, NFR-06 | Live GCP deployment on Cloud Run + Cloud SQL; PR merge gate with automated test checks; repeatable release pipeline. |
 | Sprint 3 | Product Hardening & Operations: Sales Analytics, Audit Logging, Rate Limiting, User Acceptance Testing (UAT), Defect Remediation, and Final Presentation. | Progress (29 Nov), Final Complete (13 Dec 2026) | F-10, F-11 | Fully hardened production system, passing all regression and UAT scenarios, comprehensive documentation, and final demo video. |
 
 ### 2. Detailed Sprint Work Breakdown

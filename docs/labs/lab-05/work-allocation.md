@@ -2,11 +2,11 @@
 
 **Project:** QuickOrder  
 **Team:** Patiharn Liangkobkit (`@Richyboy170`) and Tanakrit Sunthonwetchapong (`@Tanakrit-triton`)  
-**Lab 5 deadline:** 15 November 2026, 23:59 (per the lab handout)
+**Lab 5 deadline:** TBA; see the course announcement from 14 November 2026.
 
 ## Purpose
 
-This plan gives each person clear ownership of their own implementation, tests, evidence, and documentation. There is no shared coding task and neither person is assigned as the other's helper.
+This plan gives each person clear primary ownership of implementation, tests, evidence, and documentation. Ownership is for accountability, not a permanent role: both members must participate in deployment and be ready to explain any sampled release step.
 
 The split follows the Lab 5 score areas: Tanakrit owns Docker/configuration and GCP/persistence (55 points total); Patiharn owns CI/quality gates and repeatable releases (45 points total). Patiharn's completed Sprint 1 and Deliverable 1 work is recorded below as prior contribution, so it is not assigned again.
 
@@ -16,7 +16,7 @@ The split follows the Lab 5 score areas: Tanakrit owns Docker/configuration and 
 |---|---|---|
 | Patiharn | Completed the Sprint 1 work for the team and prepared the QuickOrder Deliverable 1 report. Patiharn reports that preparing the report took about 2–3 hours. | Count as completed contribution. Do not ask Patiharn to redo Sprint 1 or the Deliverable 1 report as Lab 5 work. |
 
-The existing Deliverable 1 PDF is [CPE344_Deliverable_1_QuickOrder.pdf](../../../submission/CPE344_Deliverable_1_QuickOrder.pdf). The sprint scope is in [docs/sprints/plan.md](../../sprints/plan.md). Lab 5 work and its final PDF are separate from that submission.
+The existing Deliverable 1 PDF is [CPE334_Deliverable_1_QuickOrder.pdf](../../../submission/CPE334_Deliverable_1_QuickOrder.pdf). The sprint scope is in [docs/sprints/plan.md](../../sprints/plan.md). Lab 5 work and its final PDF are separate from that submission.
 
 ## Ownership: Tanakrit
 
@@ -24,7 +24,8 @@ The existing Deliverable 1 PDF is [CPE344_Deliverable_1_QuickOrder.pdf](../../..
 
 - [ ] Create and label Tanakrit's own Lab 5 issue(s); keep the issue(s), branch, pull request, and evidence under Tanakrit's authorship.
 - [ ] Make a fresh-clone Docker Compose setup build and start successfully. Check the environment examples and document every required setting without putting real credentials in Git.
-- [ ] Own the GCP setup and its operating cost safeguards: set a budget alert before creating billable resources; use the course-prescribed free-trial account and do not prepay or upgrade.
+- [ ] Keep GCP provisioning on hold until the course announces that the GCP access issue is resolved. While waiting, complete only non-billable preparation such as Docker checks and documentation.
+- [ ] After the course announces the access fix, own the GCP setup and its operating cost safeguards: set a budget alert before creating billable resources; use the course-prescribed free-trial account and do not prepay or upgrade.
 - [ ] Set up the Cloud Run and Cloud SQL PostgreSQL resources, secrets, and runtime access needed by QuickOrder. Use the resource naming contract in the current [deployment runbook](./deployment.md); record the actual project ID and any changed names there.
 - [ ] Align the provisioning and teardown resource names in [deploy.sh](../../../deploy/deploy.sh) and [teardown.sh](../../../deploy/teardown.sh) with that contract.
 - [ ] Verify that the public application serves its UI and API and that the database is durable. Capture evidence that data remains after a service restart and a redeployment.
@@ -51,7 +52,7 @@ The existing Deliverable 1 PDF is [CPE344_Deliverable_1_QuickOrder.pdf](../../..
 
 ## Documentation and evidence ownership
 
-Each person documents only their own assigned work and writes their own contribution statement. Do not write claims about work performed by the other person. Keep the final report source material in these separate folders:
+Each person documents their own primary work and writes their own contribution statement. Do not write claims about work performed by the other person. Keep the final report source material in these separate folders:
 
 - Tanakrit: `submission/lab5/evidence/tanakrit/`
 - Patiharn: `submission/lab5/evidence/patiharn/`
@@ -71,19 +72,22 @@ Use the lab and sprint workflow for both owners' changes:
 5. After the feature pull requests are merged and checks pass, Patiharn opens the release pull request from `sprint-1-staging` to `main`. Preserve its review, CI, and deployment evidence.
 6. Keep the issues, `lab5` labels, pull requests, comments/reviews, and workflow history available for grading.
 
-## Keeping the work independent
+## Shared participation required by Lab 5
 
-No meetings, paired coding, or shared implementation are assigned. Each person owns their own issue, code, tests, documentation, AI-use notes, and evidence; Git commits and the written resource-name contract carry the handoff.
+The two work areas stay separately owned, with no paired coding or shared implementation tasks. The Lab 5 handout also says the work cannot be divided into permanent roles, so both members must take part in release/deployment and understand the overall workflow.
 
-The course workflow still requires a teammate review, and Lab 5 requires both members to be able to explain their contributions and demonstrate their participation. Therefore, the only planned direct collaboration is the required asynchronous GitHub review and any individual explanation requested for grading. No one is expected to implement or debug the other person's task.
+- [ ] After GCP access is restored, Tanakrit triggers at least one release from `main` and records the workflow run and running commit.
+- [ ] After a deployment, Patiharn independently runs and records a persistence check across restart/redeployment.
+- [ ] Each member reviews the other's pull request and can explain the other member's assigned area, including the relevant tests and documentation.
+- [ ] Both members can explain any release step sampled by a TA, not only the step each personally performed.
 
-Each member should be able to show their own requirement/issue, implementation, test result, AI-supervision notes required by the course, review activity, and deployment step. Tanakrit demonstrates the infrastructure/provisioning and persistence checks; Patiharn demonstrates the CI gate and release. Each reviews the other's pull request on GitHub; each author handles their own follow-up changes.
+Each member keeps their own requirement/issue, implementation, test result, AI-supervision notes required by the course, review activity, and deployment evidence. A reviewer can request clarification in the PR; each author makes changes to their own work.
 
 ## Reference files
 
 - [Lab 5 handout](../../../01_SE_Lab_5_updated.pdf)
 - [GCP deployment and CI/CD student guide](../../../03_Student-Guide-GCP-Deployment-and+CI+CD-V1_1.pdf)
 - [Project Deliverable 1 instructions](../../../project_deliverable_1_v1.pdf)
-- [Completed QuickOrder Deliverable 1 submission](../../../submission/CPE344_Deliverable_1_QuickOrder.pdf)
+- [Completed QuickOrder Deliverable 1 submission](../../../submission/CPE334_Deliverable_1_QuickOrder.pdf)
 - [Sprint plan](../../sprints/plan.md)
 - [Deployment runbook](./deployment.md)

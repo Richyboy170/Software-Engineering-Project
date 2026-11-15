@@ -849,7 +849,7 @@ A Sprint 1 increment is done when required behavior is implemented, planned veri
 
 # PART F — Working Sprint 1 and verification
 
-Evidence cut-off: 14 November 2026. This section distinguishes the main-branch snapshot from the later persistence feature PR.
+Evidence cut-off: 15 November 2026. This section distinguishes the unreleased main-branch snapshot from persistence integrated into sprint-1-staging.
 
 ## F.1 Release and repository state
 

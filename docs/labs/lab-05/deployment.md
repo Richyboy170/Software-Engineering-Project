@@ -136,3 +136,26 @@ docker compose down -v
 6. **Determining Running Revision Commit:**
    - Run `gcloud run services describe quickorder --region asia-southeast1 --format='value(metadata.annotations["client.knative.dev/user-image"])'`
    - Or open Cloud Run Console -> Revisions -> inspect container image tag.
+
+## 6. CI, Quality Gates, and Release Evidence
+
+The required pull-request check is the `test-and-docker` job in
+[ci-docker.yml](../../../.github/workflows/ci-docker.yml). It must pass backend
+tests against PostgreSQL, the frontend build, deployment-script syntax and
+offline tests, and the production Docker build before a pull request can merge.
+The branch ruleset for `main` requires this check and a peer approval.
+
+For the Lab 5 evidence, record:
+
+- one normal pull-request run where `test-and-docker` passes;
+- one deliberately failing pull-request change where the required check fails
+  and the pull request is blocked, without merging that change;
+- the successful release workflow run after the staging-to-main release;
+- the commit SHA/image tag, resolved image digest, Cloud Run revision, public URL,
+  and smoke-test results;
+- for rollback, the manually entered 40-character image tag and the workflow
+  result showing that migration was skipped.
+
+Keep Patiharn's CI and release screenshots or source notes in
+`submission/lab5/evidence/patiharn/`. Do not claim that a check or deployment
+passed until its GitHub Actions or Cloud Run result has been captured.

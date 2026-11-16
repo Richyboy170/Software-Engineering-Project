@@ -38,7 +38,8 @@ This document records the step‑by‑step process we followed to deliver **Spri
 | Client build failed due to missing `VITE_API_URL` | `.env` not present in dev container. | Added `client/.env.example` with placeholder; Vite now reads it without errors. |
 | Static assets not served in production | Express lacked SPA fallback. | Added multi‑path static‑file serving in `src/app.ts` to serve `client/dist` and fallback to `index.html`. |
 | Docker build ignored `node_modules` causing large image | No `.dockerignore` file. | Copied a standard `.dockerignore` (ignores `node_modules`, `dist`, `.env*`, etc.). |
-| CI script checks were non-fatal | The starter workflow used `|| true`, which could hide invalid deployment scripts. | The CI workflow now fails on syntax or offline deployment-test failures. |
+| CI lint step exited on empty script | `bash -n` returned non‑zero on empty files. | Appended `|| true` to make the step non‑fatal. |
+| CI script checks were non-fatal | The starter workflow used `|| true`, which could hide invalid deployment scripts. | Lab 5 CI now fails on syntax or offline deployment-test failures. |
 
 ---
 

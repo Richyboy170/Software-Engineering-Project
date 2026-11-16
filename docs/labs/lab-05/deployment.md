@@ -141,7 +141,7 @@ docker compose down -v
 
 The required pull-request check is the `test-and-docker` job in
 [ci-docker.yml](../../../.github/workflows/ci-docker.yml). It must pass backend
-tests against PostgreSQL, frontend tests and build, deployment-script syntax and
+tests against PostgreSQL, the frontend build, deployment-script syntax and
 offline tests, and the production Docker build before a pull request can merge.
 The branch ruleset for `main` requires this check and a peer approval.
 

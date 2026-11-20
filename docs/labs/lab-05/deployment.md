@@ -29,12 +29,13 @@ No real secrets are committed to Git. All runtime settings are supplied via envi
 
 | Variable Name | Purpose / Description | Secret? | Source / Where Value Comes From | Example / Default |
 |---|---|:---:|---|---|
-| `PORT` | Listening port for the application container | No | Cloud Run container contract | `3000` |
-| `NODE_ENV` | Application environment mode | No | Injected by runtime / Docker | `production` |
-| `TZ` | Container timezone | No | Injected by Dockerfile | `Asia/Bangkok` |
-| `DATABASE_URL` | PostgreSQL connection string | **Yes** | Google Secret Manager (`quickorder-database-url`) | `postgresql://quickorder:PASS@/quickorder?host=/cloudsql/...` |
-| `CORS_ORIGIN` | Allowed client origin | No | Environment variable | `http://localhost:5173` |
-| `SESSION_SECRET`| Token encryption and signing seed | **Yes** | Google Secret Manager (`quickorder-session-secret`) | (Random 64-char hex string) |
+| `PORT` | Listening port for the application container (`server/src/index.ts`) | No | Cloud Run container contract | `3000` |
+| `NODE_ENV` | Application environment mode (`server/src/index.ts`, `server/src/db.ts`, `server/src/persistence/runtime.ts`, `server/prisma/seed.ts`) | No | Set by `deploy/deploy.sh` / Docker | `production` |
+| `DATABASE_URL` | PostgreSQL connection string (read by Prisma via `server/prisma/schema.prisma`) | **Yes** | Google Secret Manager (`quickorder-database-url`) | `postgresql://USER:PASS@/quickorder?host=/cloudsql/PROJECT:REGION:INSTANCE` |
+| `DEMO_USER_PASSWORD` | Password for seeded demo users (`server/prisma/seed.ts`); required when `NODE_ENV=production`, falls back to a dev-only default otherwise | **Yes** | Google Secret Manager (`quickorder-demo-password`), injected into the migrate/seed job by `deploy/deploy.sh --demo` | `replace-with-demo-password` |
+| `SEED_DEMO_DATA` | In production, demo users are seeded only when this is `true` (`prisma/seed.ts`). | No | Set by `deploy/deploy.sh` (`true` with `--demo`, otherwise `false`) | `false` |
+| `TZ` | Container timezone; read by the Node.js runtime, not by app code | No | Set by the Dockerfiles and `deploy/deploy.sh` | `Asia/Bangkok` |
+| `ADMIN_PASSWORD` | Created by `deploy/deploy.sh` as Secret Manager secret `quickorder-admin-password` and passed to the migrate job; not read by the current app (no admin role in Sprint 1). | **Yes** | Google Secret Manager (`quickorder-admin-password`) | `replace-with-admin-password` |
 
 ---
 

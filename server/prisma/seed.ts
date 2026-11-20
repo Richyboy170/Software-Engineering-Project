@@ -3,13 +3,36 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+function getDemoPassword(): string {
+  const fromEnv = process.env.DEMO_USER_PASSWORD;
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("DEMO_USER_PASSWORD must be set when NODE_ENV is production.");
+  }
+  // Local development and CI fallback only.
+  return "Password123!";
+}
+
 async function main() {
   console.log("Seeding QuickOrder database...");
 
-  const salt = bcrypt.genSaltSync(10);
-  const passwordHash = bcrypt.hashSync("Password123!", salt);
+  const seedDemoUsers =
+    process.env.NODE_ENV !== "production" || process.env.SEED_DEMO_DATA === "true";
 
-  // Seed Users
+  if (seedDemoUsers) {
+    await seedUsers();
+  } else {
+    console.log("Skipping demo users (SEED_DEMO_DATA is not true).");
+  }
+
+  await seedMenuItems();
+  console.log("Database seed complete.");
+}
+
+async function seedUsers() {
+  const salt = bcrypt.genSaltSync(10);
+  const passwordHash = bcrypt.hashSync(getDemoPassword(), salt);
+
   const customer = await prisma.user.upsert({
     where: { email: "customer@quickorder.local" },
     update: {},
@@ -46,8 +69,9 @@ async function main() {
   console.log(
     `Seeded users: ${customer.email} (CUSTOMER), ${secondCustomer.email} (CUSTOMER), ${staff.email} (STAFF)`
   );
+}
 
-  // Seed Menu Items
+async function seedMenuItems() {
   const items = [
     {
       name: "Classic Cheeseburger",
@@ -99,7 +123,6 @@ async function main() {
   }
 
   console.log(`Seeded ${items.length} menu items.`);
-  console.log("Database seed complete.");
 }
 
 main()

@@ -23,9 +23,9 @@ class SmokeTests(unittest.TestCase):
             '/api/health': b'{"status":"ok"}',
             '/api/ready': b'{"db":"connected"}',
             '/': b'<html></html>',
-            '/api/categories': b'[{"id":1}]',
-            '/api/auth/login': b'{"token":"test-session"}',
-            '/api/auth/me': b'{"id":1}',
+            '/api/menu': b'{"success":true,"data":[{"id":"menu_01"}]}',
+            '/api/auth/login': b'{"success":true,"data":{"token":"test-session"}}',
+            '/api/auth/me': b'{"success":true,"data":{"id":"usr_01"}}',
             '/api/auth/logout': b'{}',
         }[path]
 

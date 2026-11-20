@@ -133,7 +133,7 @@ docker compose down -v
    - Pushes image to Artifact Registry and resolves image digest.
    - Executes Cloud Run migration job.
    - Updates Cloud Run service with zero downtime.
-   - Executes automated smoke test against the live public URL (`/api/health`, `/api/ready`, `/`, `/api/categories`).
+   - Executes automated smoke test against the live public URL (`/api/health`, `/api/ready`, `/`, `/api/menu`; optional login when `SMOKE_EMAIL`/`SMOKE_PASSWORD` are set).
 6. **Determining Running Revision Commit:**
    - Run `gcloud run services describe quickorder --region asia-southeast1 --format='value(metadata.annotations["client.knative.dev/user-image"])'`
    - Or open Cloud Run Console -> Revisions -> inspect container image tag.

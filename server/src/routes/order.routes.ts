@@ -85,6 +85,39 @@ export function createOrderRouter(persistence: QuickOrderPersistence) {
   );
 
   router.get(
+    "/:id/receipt",
+    auth,
+    asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+      const order = await persistence.getOrderById(req.params.id);
+      if (!order) {
+        res.status(404).json({
+          success: false,
+          error: { code: "NOT_FOUND", message: "Order not found." },
+        });
+        return;
+      }
+      if (req.user!.role === "CUSTOMER" && order.customerId !== req.user!.id) {
+        res.status(403).json({
+          success: false,
+          error: { code: "FORBIDDEN", message: "You are not authorized to view this receipt." },
+        });
+        return;
+      }
+      res.status(200).json({
+        success: true,
+        data: {
+          pickupCode: order.pickupCode,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          totalPrice: order.totalPrice,
+          items: order.items,
+          createdAt: order.createdAt,
+        },
+      });
+    })
+  );
+
+  router.get(
     "/:id",
     auth,
     asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

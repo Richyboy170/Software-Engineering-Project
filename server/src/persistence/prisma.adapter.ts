@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import { Prisma, PrismaClient } from "@prisma/client";
 import type {
   MenuItem as DbMenuItem,
@@ -20,6 +20,22 @@ import type {
 
 const sessionLifetimeMs = 24 * 60 * 60 * 1000;
 type DbOrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
+
+async function generateUniquePickupCode(prisma: Prisma.TransactionClient): Promise<string> {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const code = Array.from({ length: 4 }, () =>
+      alphabet[randomInt(0, alphabet.length)]
+    ).join("");
+    const existing = await prisma.order.findUnique({
+      where: { pickupCode: code },
+      select: { id: true },
+    });
+    if (!existing) return code;
+  }
+  throw new Error("Could not allocate a unique pickup code.");
+}
+
 
 class InsufficientStockError extends Error {
   constructor(
@@ -71,6 +87,7 @@ function mapOrder(order: DbOrderWithItems) {
   return {
     id: order.id,
     orderNumber: order.orderNumber,
+    pickupCode: order.pickupCode,
     customerId: order.customerId,
     status: order.status,
     totalPrice: order.totalPrice.toNumber(),
@@ -214,6 +231,7 @@ export class PrismaPersistence implements QuickOrderPersistence {
         const order = await tx.order.create({
           data: {
             orderNumber: `QO-${randomBytes(12).toString("hex").toUpperCase()}`,
+            pickupCode: await generateUniquePickupCode(tx),
             customerId,
             totalPrice,
             items: { create: orderItems },

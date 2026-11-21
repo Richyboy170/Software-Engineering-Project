@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
 import { app } from "../src/app.js";
 import { store } from "../src/store.js";
+import { resetLoginRateLimitForTests } from "../src/routes/auth.routes.js";
 
 describe("Feature F-01: Authentication & Health Checks", () => {
   beforeEach(() => {
     store.seedDefaultData();
+    resetLoginRateLimitForTests();
   });
 
   describe("GET /api/health", () => {
@@ -13,6 +15,8 @@ describe("Feature F-01: Authentication & Health Checks", () => {
       const res = await request(app).get("/api/health");
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ status: "ok", service: "QuickOrder API" });
+      expect(res.headers["x-request-id"]).toBeDefined();
+      expect(res.headers["x-content-type-options"]).toBe("nosniff");
     });
   });
 
@@ -59,6 +63,28 @@ describe("Feature F-01: Authentication & Health Checks", () => {
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
       expect(res.body.error.code).toBe("INVALID_CREDENTIALS");
+    });
+
+    it("blocks repeated failed login attempts with 429", async () => {
+      for (let attempt = 0; attempt < 5; attempt++) {
+        await request(app)
+          .post("/api/auth/login")
+          .send({
+            email: "customer@quickorder.local",
+            password: "WrongPassword!",
+          });
+      }
+
+      const blocked = await request(app)
+        .post("/api/auth/login")
+        .send({
+          email: "customer@quickorder.local",
+          password: "WrongPassword!",
+        });
+
+      expect(blocked.status).toBe(429);
+      expect(blocked.body.error.code).toBe("TOO_MANY_ATTEMPTS");
+      expect(blocked.headers["retry-after"]).toBeDefined();
     });
   });
 

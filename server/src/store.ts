@@ -47,6 +47,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   orderNumber: string;
+  pickupCode: string;
   customerId: string;
   status: OrderStatus;
   totalPrice: number;
@@ -61,6 +62,19 @@ class InMemoryStore {
   public menuItems: Map<string, MenuItem> = new Map();
   public orders: Map<string, Order> = new Map();
   private orderCounter = 100;
+
+  private generatePickupCode(): string {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    do {
+      code = Array.from({ length: 4 }, () =>
+        alphabet[crypto.randomInt(0, alphabet.length)]
+      ).join("");
+    } while (
+      Array.from(this.orders.values()).some((order) => order.pickupCode === code)
+    );
+    return code;
+  }
 
   constructor() {
     this.seedDefaultData();
@@ -305,6 +319,7 @@ class InMemoryStore {
     const order: Order = {
       id: orderId,
       orderNumber,
+      pickupCode: this.generatePickupCode(),
       customerId,
       status: "PENDING",
       totalPrice: Math.round(totalPrice * 100) / 100,

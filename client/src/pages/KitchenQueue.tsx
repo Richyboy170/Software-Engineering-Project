@@ -152,6 +152,18 @@ export const KitchenQueue: React.FC = () => {
                     <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#0f172a" }}>
                       #{order.orderNumber}
                     </span>
+                    <span style={{
+                      display: "inline-block",
+                      marginLeft: "0.5rem",
+                      padding: "0.15rem 0.45rem",
+                      borderRadius: 4,
+                      backgroundColor: "#fff1ea",
+                      color: "#c84c32",
+                      fontWeight: 800,
+                      letterSpacing: "0.12em"
+                    }}>
+                      {order.pickupCode}
+                    </span>
                     <span style={{ fontSize: "0.75rem", color: "#94a3b8", marginLeft: "0.5rem" }}>
                       {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>

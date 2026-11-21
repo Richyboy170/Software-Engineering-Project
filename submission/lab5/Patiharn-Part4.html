@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Answer Part 4</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 36px 48px; color: #111; }
+    h1 { font-size: 22px; } h2 { font-size: 17px; } h3 { font-size: 14px; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0 18px; }
+    th, td { border: 1px solid #777; padding: 6px; font-size: 11px; vertical-align: top; }
+    th { background: #e9eef5; } code { font-size: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Answer Part 4: Repeatable Release Pipeline</h1>
+  <h2>C-06: Reviewed release and running commit</h2>
+  <p><strong>Staging review example:</strong> Issue #15 was linked to PR #16 for the GCP resources/deployment-record documentation. Tanakrit authored PR #16 and Patiharn reviewed/approved it before it entered <code>sprint-1-staging</code>. Release PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/18">#18</a> then moved staging to main and received Tanakrit's substantive approval.</p>
+  <p>The procedure is documented in <a href="../../../docs/labs/lab-05/deployment.md">deployment.md Section 5</a>.</p>
+  <p>The approved staging-to-main release PR #18 was merged into <code>main</code>. PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/18">#18</a> had passing <code>test-and-docker</code> and was approved by Tanakrit before merge.</p>
+  <table>
+    <tr><th>Item</th><th>Value</th></tr>
+    <tr><td>Merge commit</td><td><code>12c18be5fa0571abf374f0b447baa49117826513</code></td></tr>
+    <tr><td>Cloud Run revision</td><td><code>quickorder-00003-55s</code></td></tr>
+    <tr><td>Image tag</td><td><code>12c18be5fa0571abf374f0b447baa49117826513</code></td></tr>
+    <tr><td>Image digest</td><td><code>sha256:426990572d5275d7c67c8503d3cabcc9038615c0e34d69778833268c8d86e128</code></td></tr>
+  </table>
+
+  <p>Deploy run: <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44882991816">44882991816</a>. The workflow built and pushed the 40-character SHA tag, resolved and deployed the image digest, ran the migration job, and created revision <code>quickorder-00003-55s</code>. It served 100% of traffic and passed smoke checks for <code>/api/health</code>, <code>/api/ready</code>, <code>/</code>, and <code>/api/menu</code>.</p>
+
+  <h3>Repeatable procedure</h3>
+  <ol>
+    <li>Create and review a feature PR into <code>sprint-1-staging</code>; <code>test-and-docker</code> must pass.</li>
+    <li>Open an approved release PR from <code>sprint-1-staging</code> to <code>main</code>.</li>
+    <li>Merge into <code>main</code>; the deploy workflow is restricted to the demo environment and <code>main</code>.</li>
+    <li>GitHub Actions authenticates with WIF, builds the full-SHA tag, resolves its digest, runs migration, deploys Cloud Run, and smoke-tests the public URL.</li>
+    <li>Verify the running revision and image with Cloud Run, and verify the workflow commit, SHA tag and digest in GitHub Actions.</li>
+  </ol>
+
+  <h3>Independent persistence check</h3>
+  <p>Patiharn performed a public, read-only check after the pipeline release. <code>/api/health</code> returned <code>{"status":"ok"}</code>; <code>/api/ready</code> returned <code>{"status":"ready","db":"connected"}</code>; and <code>/api/menu</code> returned HTTP 200 with seeded database-backed rows and unchanged stock (Cheeseburger 18, Fries 2, Matcha unavailable). Tanakrit's Part 3 provides the restart/redeploy evidence and the order that was present across revisions.</p>
+
+  <h3>Rollback identification</h3>
+  <p>A rollback uses a previous full 40-character commit SHA. <code>deploy/release.sh</code> validates the SHA, redeploys the image tag, and skips migration unless normal release mode is selected. The rollback image may be identified by the deployed image digest and Cloud Run revision.</p>
+</body>
+</html>

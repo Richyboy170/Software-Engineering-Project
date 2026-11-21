@@ -10,6 +10,7 @@ prisma: prisma generate v5.22.0 — PASS
 
 ## Tests
 GitHub CI run: https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44958787735
+Migration-hardening rerun: https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44962579317
 
 ```text
 Test Files  5 passed (5)

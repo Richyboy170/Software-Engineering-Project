@@ -22,7 +22,7 @@
   <h1>CPE 334 - QuickOrder Lab 5</h1>
   <h2>Answer Part 0: Team and Evidence Index</h2>
   <div class="meta">
-    <strong>Team number:</strong> QuickOrder / CPE 334 Section 31 &nbsp;|&nbsp;
+    <strong>Team number / topic:</strong> CPE 334 Section 31 — QuickOrder campus ordering system &nbsp;|&nbsp;
     <strong>Running commit:</strong> <code>12c18be5fa0571abf374f0b447baa49117826513</code> &nbsp;|&nbsp;
     <strong>Running revision:</strong> <code>quickorder-00003-55s</code>
   </div>
@@ -52,11 +52,11 @@
 
   <h2>Answer Part 1: CI and Quality Gate</h2>
   <h3>C-01: Meaningful passing PR check</h3>
-  <p>Release PR #18 ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832537856">44832537856</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
-  <p>Backend test summary: 32 tests passed across the Vitest/Supertest suite, with zero failures. The frontend build and Docker image build completed successfully.</p>
+  <p>Patiharn's feature PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/9">#9</a> ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/43851990563">43851990563</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
+  <p>The backend, frontend build, deployment-script checks, and Docker production build were successful.</p>
 
   <h3>C-02: Failing PR cannot merge</h3>
-  <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832287247">44832287247</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
+  <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Reopened run <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44888190352">44888190352</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
   <figure>
     <img src="evidence/patiharn/pr17-blocked.png" alt="PR 17 failed check and blocked merge" style="width:100%;border:1px solid #b9c4d0;">
     <figcaption><strong>Figure 1-1.</strong> PR #17 reopened for evidence shows the failing <code>test-and-docker</code> check and the merge box blocked by the required check. The branch and PR were closed after the screenshot.</figcaption>

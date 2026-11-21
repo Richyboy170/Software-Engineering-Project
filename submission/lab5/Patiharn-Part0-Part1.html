@@ -14,6 +14,7 @@
 <body>
   <h1>CPE 334 - QuickOrder Lab 5</h1>
   <h2>Answer Part 0: Team and Evidence Index</h2>
+  <p><strong>Team number:</strong> QuickOrder / CPE 334 Section 31. <strong>Running commit:</strong> <code>12c18be5fa0571abf374f0b447baa49117826513</code>. <strong>Running revision:</strong> <code>quickorder-00003-55s</code>.</p>
   <table>
     <tr><th>Team member</th><th>Student ID</th><th>GitHub</th><th>Primary Lab 5 role</th></tr>
     <tr><td>Patiharn Liangkobkit</td><td>66070503489</td><td>@Richyboy170</td><td>CI, quality gates, release pipeline, evidence assembly</td></tr>
@@ -26,18 +27,29 @@
   <h3>Evidence index</h3>
   <table>
     <tr><th>Rubric part</th><th>Artifact</th><th>IDs / versions</th><th>Result</th></tr>
-    <tr><td>0</td><td>This index and contribution table</td><td>Team and repository</td><td>Complete</td></tr>
-    <tr><td>1</td><td>CI workflow, PR #18, PR #17</td><td>C-01, C-02</td><td>Normal pass and intentional failure captured</td></tr>
+    <tr><td>0</td><td>Team, running commit, evidence index, contribution table</td><td>12c18be; quickorder-00003-55s</td><td>Complete</td></tr>
+    <tr><td>1</td><td><a href="../../../.github/workflows/ci-docker.yml">ci-docker.yml</a>, PR #18, PR #17, protect-main ruleset</td><td>C-01, C-02</td><td>Normal pass and blocked failure captured</td></tr>
     <tr><td>2/3</td><td>Tanakrit Part 2/3 PDF</td><td>C-03 to C-05, R-01 to R-04</td><td>Complete</td></tr>
-    <tr><td>4</td><td>Deploy workflow run 44882991816</td><td>C-06, revision 00003-55s</td><td>Commit and digest identified</td></tr>
+    <tr><td>4</td><td><a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44882991816">Deploy run 44882991816</a>, <a href="../../../docs/labs/lab-05/deployment.md">deployment.md</a></td><td>C-06, revision 00003-55s</td><td>Commit and digest identified</td></tr>
+  </table>
+  <h3>Contribution table</h3>
+  <table>
+    <tr><th>Member</th><th>Issues / PRs</th><th>Contribution</th></tr>
+    <tr><td>Patiharn Liangkobkit</td><td>Issue #10, PR #9, PR #17, PR #18, PR #19</td><td>CI quality gate, rulesets, deployment/release documentation, C-01/C-02/C-06 evidence, PDF assembly</td></tr>
+    <tr><td>Tanakrit Sunthonwetchapong</td><td>Issues #14/#15, PR #11/#12/#13/#16, PR #18</td><td>GCP provisioning, Docker/configuration, WIF, smoke test, Cloud SQL/persistence evidence, release approval</td></tr>
   </table>
 
   <h2>Answer Part 1: CI and Quality Gate</h2>
   <h3>C-01: Meaningful passing PR check</h3>
   <p>Release PR #18 ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832537856">44832537856</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
+  <p>Backend test summary: 32 tests passed across the Vitest/Supertest suite, with zero failures. The frontend build and Docker image build completed successfully.</p>
 
   <h3>C-02: Failing PR cannot merge</h3>
   <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832287247">44832287247</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
+  <p><strong>Figure 1-1.</strong> PR #17 reopened for evidence shows the failing <code>test-and-docker</code> check and the merge box blocked by the required check. The branch and PR were closed after the screenshot.</p>
+  <img src="evidence/patiharn/pr17-blocked.png" alt="PR 17 failed check and blocked merge" style="width:100%;border:1px solid #777;">
+  <p><strong>Figure 1-2.</strong> <code>protect-main</code> requires one approval and the <code>test-and-docker</code> status check. This setting prevented the failing temporary change from entering the release path.</p>
+  <img src="evidence/patiharn/protect-main-ruleset.png" alt="Protect main ruleset" style="width:100%;border:1px solid #777;">
   <p>The repository ruleset <code>protect-sprint1-release</code> also protects staging and main. Ruleset <code>protect-main</code> requires one approval and the passing <code>test-and-docker</code> status check on <code>main</code>.</p>
 
   <h3>Patiharn contribution</h3>

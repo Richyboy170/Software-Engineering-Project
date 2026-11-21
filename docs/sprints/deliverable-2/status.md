@@ -11,6 +11,7 @@
 - Server TypeScript build passed.
 - Client TypeScript/Vite production build passed.
 - Prisma 5.22 client generated locally.
+- Prisma schema validates with a placeholder PostgreSQL URL.
 - GitHub CI will verify the test suite and Docker build.
 
 ## Not yet verified locally

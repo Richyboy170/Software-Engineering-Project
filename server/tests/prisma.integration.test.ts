@@ -92,6 +92,7 @@ databaseTests("Prisma PostgreSQL integration", () => {
       const order = await prisma.order.create({
         data: {
           orderNumber,
+          pickupCode: randomUUID().replaceAll("-", "").slice(0, 4).toUpperCase(),
           customerId: customer.id,
           totalPrice: menuItem.price,
           items: {
@@ -328,6 +329,7 @@ databaseTests("Prisma PostgreSQL integration", () => {
       const staffOwnedOrder = await prisma.order.create({
         data: {
           orderNumber: `TEST-${Date.now()}`,
+          pickupCode: randomUUID().replaceAll("-", "").slice(0, 4).toUpperCase(),
           customerId: staff.id,
           totalPrice: menuItem.price,
           items: {

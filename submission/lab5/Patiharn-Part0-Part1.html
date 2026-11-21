@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Answer Parts 0 and 1</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 36px 48px; color: #111; }
+    h1 { font-size: 22px; } h2 { font-size: 17px; margin-top: 18px; }
+    table { border-collapse: collapse; width: 100%; margin: 10px 0 18px; }
+    th, td { border: 1px solid #777; padding: 6px; font-size: 11px; vertical-align: top; }
+    th { background: #e9eef5; } a { color: #0645ad; }
+  </style>
+</head>
+<body>
+  <h1>CPE 334 - QuickOrder Lab 5</h1>
+  <h2>Answer Part 0: Team and Evidence Index</h2>
+  <table>
+    <tr><th>Team member</th><th>Student ID</th><th>GitHub</th><th>Primary Lab 5 role</th></tr>
+    <tr><td>Patiharn Liangkobkit</td><td>66070503489</td><td>@Richyboy170</td><td>CI, quality gates, release pipeline, evidence assembly</td></tr>
+    <tr><td>Tanakrit Sunthonwetchapong</td><td>67070503464</td><td>@Tanakrit-triton</td><td>Docker, GCP resources, deployment and persistence</td></tr>
+  </table>
+  <table>
+    <tr><th>Repository</th><th>Public URL</th><th>Project / region</th></tr>
+    <tr><td><a href="https://github.com/Richyboy170/Software-Engineering-Project">GitHub repository</a></td><td><a href="https://quickorder-fzeemousqa-as.a.run.app">QuickOrder</a></td><td>cpe334-quickorder / asia-southeast1</td></tr>
+  </table>
+  <h3>Evidence index</h3>
+  <table>
+    <tr><th>Rubric part</th><th>Artifact</th><th>IDs / versions</th><th>Result</th></tr>
+    <tr><td>0</td><td>This index and contribution table</td><td>Team and repository</td><td>Complete</td></tr>
+    <tr><td>1</td><td>CI workflow, PR #18, PR #17</td><td>C-01, C-02</td><td>Normal pass and intentional failure captured</td></tr>
+    <tr><td>2/3</td><td>Tanakrit Part 2/3 PDF</td><td>C-03 to C-05, R-01 to R-04</td><td>Complete</td></tr>
+    <tr><td>4</td><td>Deploy workflow run 44882991816</td><td>C-06, revision 00003-55s</td><td>Commit and digest identified</td></tr>
+  </table>
+
+  <h2>Answer Part 1: CI and Quality Gate</h2>
+  <h3>C-01: Meaningful passing PR check</h3>
+  <p>Release PR #18 ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832537856">44832537856</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
+
+  <h3>C-02: Failing PR cannot merge</h3>
+  <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832287247">44832287247</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
+  <p>The repository ruleset <code>protect-sprint1-release</code> also protects staging and main. Ruleset <code>protect-main</code> requires one approval and the passing <code>test-and-docker</code> status check on <code>main</code>.</p>
+
+  <h3>Patiharn contribution</h3>
+  <table>
+    <tr><th>Work</th><th>Evidence</th></tr>
+    <tr><td>Added CI and Docker quality gate</td><td>PR #9, issue #10</td></tr>
+    <tr><td>Added release workflow and release script</td><td>PR #9, deploy/release.sh, deploy.yml</td></tr>
+    <tr><td>Added rulesets and merge protection</td><td><code>protect-sprint1-release</code>, <code>protect-main</code></td></tr>
+    <tr><td>Captured C-01 and C-02 evidence</td><td>PR #18 and PR #17</td></tr>
+  </table>
+</body>
+</html>

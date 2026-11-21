@@ -3,19 +3,53 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+function getDemoPassword(): string {
+  const fromEnv = process.env.DEMO_USER_PASSWORD;
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("DEMO_USER_PASSWORD must be set when NODE_ENV is production.");
+  }
+  // Local development and CI fallback only.
+  return "Password123!";
+}
+
 async function main() {
   console.log("Seeding QuickOrder database...");
 
-  const salt = bcrypt.genSaltSync(10);
-  const passwordHash = bcrypt.hashSync("Password123!", salt);
+  const seedDemoUsers =
+    process.env.NODE_ENV !== "production" || process.env.SEED_DEMO_DATA === "true";
 
-  // Seed Users
+  if (seedDemoUsers) {
+    await seedUsers();
+  } else {
+    console.log("Skipping demo users (SEED_DEMO_DATA is not true).");
+  }
+
+  await seedMenuItems();
+  console.log("Database seed complete.");
+}
+
+async function seedUsers() {
+  const salt = bcrypt.genSaltSync(10);
+  const passwordHash = bcrypt.hashSync(getDemoPassword(), salt);
+
   const customer = await prisma.user.upsert({
     where: { email: "customer@quickorder.local" },
     update: {},
     create: {
       email: "customer@quickorder.local",
       fullName: "Patiharn Liangkobkit",
+      passwordHash,
+      role: "CUSTOMER",
+    },
+  });
+
+  const secondCustomer = await prisma.user.upsert({
+    where: { email: "customer2@quickorder.local" },
+    update: {},
+    create: {
+      email: "customer2@quickorder.local",
+      fullName: "Customer Two",
       passwordHash,
       role: "CUSTOMER",
     },
@@ -32,9 +66,12 @@ async function main() {
     },
   });
 
-  console.log(`Seeded users: ${customer.email} (CUSTOMER), ${staff.email} (STAFF)`);
+  console.log(
+    `Seeded users: ${customer.email} (CUSTOMER), ${secondCustomer.email} (CUSTOMER), ${staff.email} (STAFF)`
+  );
+}
 
-  // Seed Menu Items
+async function seedMenuItems() {
   const items = [
     {
       name: "Classic Cheeseburger",
@@ -86,7 +123,6 @@ async function main() {
   }
 
   console.log(`Seeded ${items.length} menu items.`);
-  console.log("Database seed complete.");
 }
 
 main()

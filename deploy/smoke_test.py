@@ -11,7 +11,8 @@ WHAT THIS SCRIPT DOES
       1. GET /api/health      -> {"status": "ok"}
       2. GET /api/ready       -> {"db": "connected"}   (proves the DB works)
       3. GET /                -> HTML page (the built React app is served)
-      4. GET /api/categories  -> non-empty list (migration + seed worked)
+      4. GET /api/menu        -> {"success": true, "data": [...]} non-empty,
+                                 read from PostgreSQL (migration + seed worked)
       5. OPTIONAL login test  -> login, /api/auth/me, logout. Runs only if BOTH
          env vars SMOKE_EMAIL and SMOKE_PASSWORD are set (set both or neither).
          The session is always logged out, even if a check fails.
@@ -26,8 +27,9 @@ REFERENCES
 
 CHANGE ME (groups using another tech stack):
     - the endpoint paths and expected responses in check() below
-      (/api/health, /api/ready, /, /api/categories, /api/auth/*)
-    - the login/logout endpoints and the 'token' field of the login response
+      (/api/health, /api/ready, /, /api/menu, /api/auth/*)
+    - the login/logout endpoints and the token field of the login response
+      (QuickOrder wraps responses as {"success": ..., "data": ...})
 """
 import json
 import os
@@ -57,7 +59,8 @@ def check(base):
         ('/api/health', lambda b: json.loads(b).get('status') == 'ok'),
         ('/api/ready', lambda b: json.loads(b).get('db') == 'connected'),
         ('/', lambda b: b'<html' in b.lower()),
-        ('/api/categories', lambda b: isinstance(json.loads(b), list) and len(json.loads(b)) > 0),
+        ('/api/menu', lambda b: json.loads(b).get('success') is True
+            and isinstance(json.loads(b).get('data'), list) and len(json.loads(b)['data']) > 0),
     ):
         # Retry: a cold Cloud Run instance may need a few seconds to start.
         for attempt in range(5):
@@ -81,7 +84,7 @@ def check(base):
     token = None
     try:
         login = json.loads(request(base, '/api/auth/login', {'email': email, 'password': password}))
-        token = login['token']
+        token = login['data']['token']
         request(base, '/api/auth/me', token=token)
         print('PASS login and authenticated /api/auth/me')
     except (urllib.error.URLError, TimeoutError, ValueError, KeyError):

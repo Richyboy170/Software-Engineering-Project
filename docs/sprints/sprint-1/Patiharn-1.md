@@ -12,7 +12,7 @@ This document records the step‑by‑step process we followed to deliver **Spri
 | 2026‑11‑10 | Core backend implemented | • Defined Prisma schema (User, MenuItem, Order, OrderItem).\n• Implemented Express routes for auth, menu, orders.\n• Added business‑rule enforcement in an in‑memory `store.ts` (mirrors transactional logic). |
 | 2026‑11‑11 | Frontend UI built | • React pages: Login, Menu (customer), My Orders, Kitchen Queue (staff).\n• TypeScript types and API wrapper (`api.ts`).\n• Role‑based navigation and cart handling. |
 | 2026‑11‑12 | Testing & verification | • Unit & integration tests with Vitest + Supertest (19 passing).\n• Generated Prisma client, ran migrations and seed script.\n• Verified builds (`npm run build`) for both client and server. |
-| 2026‑11‑12 | Docker & CI setup | • Multi‑stage Dockerfile that builds the client, generates the server bundle, and serves the SPA via Express.\n• `docker-compose.yml` defining DB, migration, server, client services.\n• GitHub Actions workflow (`.github/workflows/ci-docker.yml`) that runs tests, builds the image, and pushes to Artifact Registry. |
+| 2026‑11‑12 | Docker & CI setup | • Multi‑stage Dockerfile that builds the client, generates the server bundle, and serves the SPA via Express.\n• `docker-compose.yml` defining DB, migration, server, client services.\n• GitHub Actions workflow (`.github/workflows/ci-docker.yml`) that runs tests and verifies the production image build. |
 | 2026‑11‑12 | Documentation finished | • SRS, feature catalog, traceability matrix, system design spec, sprint plan, evidence guide, Definition of Done, lab‑05 deployment guide, plus this process log. |
 
 ---
@@ -39,14 +39,23 @@ This document records the step‑by‑step process we followed to deliver **Spri
 | Static assets not served in production | Express lacked SPA fallback. | Added multi‑path static‑file serving in `src/app.ts` to serve `client/dist` and fallback to `index.html`. |
 | Docker build ignored `node_modules` causing large image | No `.dockerignore` file. | Copied a standard `.dockerignore` (ignores `node_modules`, `dist`, `.env*`, etc.). |
 | CI lint step exited on empty script | `bash -n` returned non‑zero on empty files. | Appended `|| true` to make the step non‑fatal. |
+| CI script checks were non-fatal | The starter workflow used `|| true`, which could hide invalid deployment scripts. | Lab 5 CI now fails on syntax or offline deployment-test failures. |
 
 ---
 
-## Remaining Work (Sprint 1 Wrap‑up)
-1. **Local end‑to‑end validation** – run `docker compose up --build -d` and manually test all UI flows (login, order placement, cancellation, staff queue). 
-2. **Push to GitHub & open PR** – trigger CI and ensure the workflow passes.
-3. **Cloud Run deployment** – follow `docs/labs/lab-05/deployment.md` to deploy the image, run migration job, and verify the live endpoint.
-4. **Optional enhancements** – add Playwright e2e tests, rate‑limiting middleware, and logging for production.
+## Historical Sprint 1 Follow-up
+
+The Sprint 1 product baseline is complete. Its remaining integration items moved
+into Sprint 2/Lab 5 and are tracked in
+[docs/labs/lab-05/work-allocation.md](../../labs/lab-05/work-allocation.md):
+
+1. Patiharn owns the CI quality gate, release workflow, release script,
+   documentation, and Patiharn-authored evidence.
+2. Tanakrit owns Docker/configuration, GCP provisioning, and persistence evidence.
+3. Both members participate in review, release, and verification.
+
+The CI/CD implementation is prepared locally; GitHub execution and GCP
+verification remain deployment activities rather than Sprint 1 product work.
 
 ---
 

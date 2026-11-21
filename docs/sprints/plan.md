@@ -31,10 +31,15 @@ flowchart LR
     end
 
     subgraph Sprint2 ["Sprint 2: Core Expansion & Cloud CI/CD"]
+        S2P["Persistence foundation (Issue #4)"]
         S2A["F-07 Menu Management"]
         S2B["F-08 Receipts & Pickup Code"]
         S2C["F-09 Concurrency Locking"]
         S2D["Lab 5 GCP Pipeline & Docker"]
+        S2P --> S2A
+        S2P --> S2B
+        S2P --> S2C
+        S2P --> S2D
     end
 
     subgraph Sprint3 ["Sprint 3: Hardening & Analytics"]
@@ -66,12 +71,13 @@ flowchart LR
 
 ### 2.2 Sprint 2: Core Expansion & Cloud Delivery
 - **Goal:** Broaden administrative capabilities and deploy the system to Google Cloud Platform via a verified CI/CD pipeline.
+- **Persistence prerequisite:** Before adding Sprint 2 features or proceeding with Cloud SQL delivery, make the existing F-01 through F-06 production journey durable through Prisma and PostgreSQL. Track this foundation in [Issue #4](https://github.com/Richyboy170/Software-Engineering-Project/issues/4) and the [Sprint 2 persistence contract](./sprint-2/persistence-spec.md). It preserves the existing in-memory unit-test fixtures and follows Lab 5's issue-linked `feature/prisma-persistence` → `sprint-1-staging` review flow.
 - **Included Features:**
   - `F-07`: Staff CRUD controls for menu items (create, update description/price, restock quantities).
   - `F-08`: Printable digital receipts and unique pickup order reference codes.
   - `F-09`: Database concurrency locking to guarantee zero overselling under simultaneous requests.
   - Cloud Delivery: Cloud Run packaging, Cloud SQL persistence, Secret Manager integration, and GitHub Actions PR check rulesets (`test-and-docker`).
-- **Dependencies:** Completion of Sprint 1 release baseline on `main`.
+- **Dependencies:** Completion of the Sprint 1 release baseline on `main`; completion and peer review of the persistence prerequisite on `sprint-1-staging` before Cloud SQL delivery. The persistence foundation does not include F-07, F-08, the broad F-09 concurrency program, or GCP deployment changes.
 
 ### 2.3 Sprint 3: Hardening, Analytics & Final Delivery
 - **Goal:** Fortify system security and resilience, implement operational reporting, execute peer UAT, and finalize product delivery.

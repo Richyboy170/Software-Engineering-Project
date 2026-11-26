@@ -2,9 +2,11 @@
 
 **Project:** QuickOrder  
 **Team:** Patiharn Liangkobkit (`@Richyboy170`) and Tanakrit Sunthonwetchapong (`@Tanakrit-triton`)  
-**Lab 6 deadline:** 22 November 2026  
+**Lab 6 deadline:** 29 November 2026  
 **Deliverable 2 deadline:** 29 November 2026  
-**Status:** Draft for Tanakrit review. No implementation or defect correction starts until this allocation is confirmed.
+**Status:** Confirmed
+
+target dates: partner UAT session by 26 Nov, retest + acceptance decision by 27 Nov. Lab 7 needs the accepted Sprint 1 release as its baseline, so acceptance cannot slip to 29 Nov.
 
 ## Confirm Before Implementation
 

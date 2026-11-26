@@ -7,6 +7,14 @@ export const MyOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    pickupCode: string;
+    orderNumber: string;
+    status: Order["status"];
+    totalPrice: number;
+    items: Order["items"];
+    createdAt: string;
+  } | null>(null);
 
   const fetchOrders = async () => {
     try {
@@ -23,6 +31,15 @@ export const MyOrders: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  const handleReceipt = async (orderId: string) => {
+    try {
+      const data = await api.getReceipt(orderId);
+      setReceipt(data);
+    } catch (err: any) {
+      setActionMessage({ text: err.message || "Failed to load receipt", isError: true });
+    }
+  };
 
   const handleCancel = async (orderId: string) => {
     if (!confirm("Are you sure you want to cancel this order?")) return;
@@ -172,7 +189,22 @@ export const MyOrders: React.FC = () => {
                   Total: ฿{order.totalPrice.toFixed(2)}
                 </div>
 
-                <div>
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                  <button
+                    onClick={() => handleReceipt(order.id)}
+                    style={{
+                      padding: "0.4rem 0.85rem",
+                      backgroundColor: "#eff6ff",
+                      color: "#1d4ed8",
+                      border: "1px solid #bfdbfe",
+                      borderRadius: 6,
+                      fontSize: "0.8rem",
+                      fontWeight: 600,
+                      cursor: "pointer"
+                    }}
+                  >
+                    Receipt / Pickup
+                  </button>
                   {order.status === "PENDING" ? (
                     <button
                       onClick={() => handleCancel(order.id)}
@@ -201,6 +233,61 @@ export const MyOrders: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {receipt && (
+        <div
+          role="dialog"
+          aria-label="Digital receipt"
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(15,23,42,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 120,
+            padding: "1rem"
+          }}
+        >
+          <div style={{
+            width: "min(420px, 100%)",
+            backgroundColor: "#ffffff",
+            borderRadius: 12,
+            padding: "1.5rem",
+            border: "1px solid #e2e8f0"
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ margin: 0, fontSize: "1.2rem" }}>QuickOrder Receipt</h2>
+              <button onClick={() => setReceipt(null)} style={{ border: "none", background: "none", cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ marginTop: "1rem", textAlign: "center", background: "#f8fafc", borderRadius: 8, padding: "1rem" }}>
+              <div style={{ color: "#64748b", fontSize: "0.75rem", fontWeight: 700 }}>PICKUP CODE</div>
+              <div style={{ color: "#0f172a", fontSize: "2rem", fontWeight: 800, letterSpacing: "0.18em" }}>
+                {receipt.pickupCode}
+              </div>
+            </div>
+            <p style={{ marginTop: "1rem", color: "#475569" }}>
+              Order {receipt.orderNumber} · {receipt.status}
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+              {receipt.items.map((item) => (
+                <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.9rem" }}>
+                  <span>{item.quantity}x {item.name}</span>
+                  <span>฿{item.subtotal.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ borderTop: "1px solid #e2e8f0", marginTop: "0.75rem", paddingTop: "0.75rem", display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
+              <span>Total</span><span>฿{receipt.totalPrice.toFixed(2)}</span>
+            </div>
+            <button
+              onClick={() => window.print()}
+              style={{ marginTop: "1rem", width: "100%", padding: "0.65rem", borderRadius: 6, border: "none", background: "#2563eb", color: "#fff", fontWeight: 700, cursor: "pointer" }}
+            >
+              Print Receipt
+            </button>
+          </div>
         </div>
       )}
     </div>

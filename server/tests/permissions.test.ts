@@ -54,6 +54,21 @@ describe("Features F-04, F-06: Role Permissions & Access Isolation", () => {
       expect(unauthorizedRes.body.success).toBe(false);
       expect(unauthorizedRes.body.error.code).toBe("FORBIDDEN");
     });
+
+    it("rejects another customer when attempting to retrieve the receipt", async () => {
+      const orderRes = await request(app)
+        .post("/api/orders")
+        .set("Authorization", `Bearer ${customer1Token}`)
+        .send({ items: [{ menuItemId: "menu_01", quantity: 1 }] });
+      const orderId = orderRes.body.data.id;
+
+      const receiptRes = await request(app)
+        .get(`/api/orders/${orderId}/receipt`)
+        .set("Authorization", `Bearer ${customer2Token}`);
+
+      expect(receiptRes.status).toBe(403);
+      expect(receiptRes.body.error.code).toBe("FORBIDDEN");
+    });
   });
 
   describe("TEST-SEC-02 / AC-SEC-02: BR-06 & NFR-02 Customer Forbidden on Staff Endpoints", () => {

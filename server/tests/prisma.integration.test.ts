@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { afterAll, describe, expect, it } from "vitest";
-import { randomUUID } from "node:crypto";
+import { afterAll, describe, expect, it, vi } from "vitest";
+import { randomInt, randomUUID } from "node:crypto";
 import request from "supertest";
 import { createApp } from "../src/app.js";
 import { InMemoryPersistenceAdapter } from "../src/persistence/in-memory.adapter.js";
@@ -9,6 +9,13 @@ import { PrismaPersistence } from "../src/persistence/prisma.adapter.js";
 import { createRuntimePersistence } from "../src/persistence/runtime.js";
 
 const databaseTests = describe.skipIf(!process.env.DATABASE_URL);
+const pickupCodeAlphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+function randomPickupCode() {
+  return Array.from({ length: 4 }, () =>
+    pickupCodeAlphabet[randomInt(0, pickupCodeAlphabet.length)]
+  ).join("");
+}
 
 async function login(app: ReturnType<typeof createApp>, email: string) {
   const response = await request(app)
@@ -92,6 +99,7 @@ databaseTests("Prisma PostgreSQL integration", () => {
       const order = await prisma.order.create({
         data: {
           orderNumber,
+          pickupCode: randomPickupCode(),
           customerId: customer.id,
           totalPrice: menuItem.price,
           items: {
@@ -191,6 +199,49 @@ databaseTests("Prisma PostgreSQL integration", () => {
       expect(burger.isAvailable).toBe(false);
     } finally {
       await prisma.menuItem.update({ where: { id: item.id }, data: { stock: item.stock } });
+    }
+  });
+
+  it("retries order creation after a pickup-code unique constraint conflict", async () => {
+    const persistence = new PrismaPersistence(prisma);
+    const customer = await prisma.user.findUniqueOrThrow({
+      where: { email: "customer@quickorder.local" },
+    });
+    const menuItem = await prisma.menuItem.findFirstOrThrow({
+      where: { name: "Classic Cheeseburger" },
+    });
+    const originalStock = menuItem.stock;
+    let orderId: string | undefined;
+    const transaction = vi
+      .spyOn(prisma, "$transaction")
+      .mockRejectedValueOnce(
+        new Prisma.PrismaClientKnownRequestError("Unique constraint failed", {
+          code: "P2002",
+          clientVersion: Prisma.prismaVersion.client,
+          meta: { target: ["pickupCode"] },
+        })
+      );
+
+    try {
+      await prisma.menuItem.update({
+        where: { id: menuItem.id },
+        data: { stock: Math.max(originalStock, 1) },
+      });
+
+      const result = await persistence.createOrder(customer.id, [
+        { menuItemId: menuItem.id, quantity: 1 },
+      ]);
+
+      expect(result.success).toBe(true);
+      if (result.success) orderId = result.order.id;
+      expect(transaction).toHaveBeenCalledTimes(2);
+    } finally {
+      transaction.mockRestore();
+      if (orderId) await prisma.order.delete({ where: { id: orderId } });
+      await prisma.menuItem.update({
+        where: { id: menuItem.id },
+        data: { stock: originalStock },
+      });
     }
   });
 
@@ -328,6 +379,7 @@ databaseTests("Prisma PostgreSQL integration", () => {
       const staffOwnedOrder = await prisma.order.create({
         data: {
           orderNumber: `TEST-${Date.now()}`,
+          pickupCode: randomPickupCode(),
           customerId: staff.id,
           totalPrice: menuItem.price,
           items: {

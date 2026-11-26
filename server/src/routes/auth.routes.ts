@@ -10,8 +10,16 @@ const LoginSchema = z.object({
   password: z.string().min(1),
 });
 
+const failedLoginAttempts = new Map<string, { count: number; retryAt: number }>();
+
+export function resetLoginRateLimitForTests() {
+  failedLoginAttempts.clear();
+}
+
 export function createAuthRouter(persistence: QuickOrderPersistence) {
   const router = Router();
+  const windowMs = 15 * 60 * 1000;
+  const limit = 5;
 
   router.post(
     "/login",
@@ -29,8 +37,30 @@ export function createAuthRouter(persistence: QuickOrderPersistence) {
       }
 
       const { email, password } = parseResult.data;
+      const key = `${req.ip}:${email.toLowerCase()}`;
+      const now = Date.now();
+      const previous = failedLoginAttempts.get(key);
+      if (previous && previous.retryAt > now && previous.count >= limit) {
+        res.setHeader("Retry-After", Math.ceil((previous.retryAt - now) / 1000).toString());
+        res.status(429).json({
+          success: false,
+          error: {
+            code: "TOO_MANY_ATTEMPTS",
+            message: "Too many failed login attempts. Try again later.",
+          },
+        });
+        return;
+      }
+      if (previous && previous.retryAt <= now) {
+        failedLoginAttempts.delete(key);
+      }
       const user = await persistence.findUserByEmail(email);
       if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
+        const current = failedLoginAttempts.get(key);
+        failedLoginAttempts.set(key, {
+          count: (current?.count ?? 0) + 1,
+          retryAt: now + windowMs,
+        });
         res.status(401).json({
           success: false,
           error: {
@@ -42,6 +72,7 @@ export function createAuthRouter(persistence: QuickOrderPersistence) {
       }
 
       const session = await persistence.createSession(user.id);
+      failedLoginAttempts.delete(key);
       res.status(200).json({
         success: true,
         data: {

@@ -4,17 +4,28 @@
   <meta charset="utf-8">
   <title>Answer Parts 0 and 1</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 36px 48px; color: #111; }
-    h1 { font-size: 22px; } h2 { font-size: 17px; margin-top: 18px; }
-    table { border-collapse: collapse; width: 100%; margin: 10px 0 18px; }
-    th, td { border: 1px solid #777; padding: 6px; font-size: 11px; vertical-align: top; }
-    th { background: #e9eef5; } a { color: #0645ad; }
+    body { font-family: Arial, sans-serif; margin: 24px 36px; color: #172033; }
+    h1 { font-size: 24px; color: #c84c32; border-bottom: 3px solid #c84c32; padding-bottom: 8px; }
+    h2 { font-size: 18px; color: #c84c32; margin-top: 18px; }
+    h3 { font-size: 14px; color: #173b67; }
+    table { border-collapse: collapse; width: 100%; margin: 8px 0 16px; }
+    th, td { border: 1px solid #b9c4d0; padding: 7px; font-size: 10px; vertical-align: top; }
+    th { background: #fff1ea; color: #173b67; }
+    tr:nth-child(even) td { background: #f7f9fc; }
+    a { color: #0645ad; } code { background: #eef2f7; padding: 1px 3px; }
+    .meta { background: #f2f6fb; border-left: 4px solid #2f80ed; padding: 10px 12px; }
+    figure { margin: 12px 0; }
+    figcaption { font-size: 10px; margin-top: 4px; color: #405069; }
   </style>
 </head>
 <body>
   <h1>CPE 334 - QuickOrder Lab 5</h1>
   <h2>Answer Part 0: Team and Evidence Index</h2>
-  <p><strong>Team number:</strong> QuickOrder / CPE 334 Section 31. <strong>Running commit:</strong> <code>12c18be5fa0571abf374f0b447baa49117826513</code>. <strong>Running revision:</strong> <code>quickorder-00003-55s</code>.</p>
+  <div class="meta">
+    <strong>Team number / topic:</strong> CPE 334 Section 31 — QuickOrder campus ordering system &nbsp;|&nbsp;
+    <strong>Running commit:</strong> <code>12c18be5fa0571abf374f0b447baa49117826513</code> &nbsp;|&nbsp;
+    <strong>Running revision:</strong> <code>quickorder-00003-55s</code>
+  </div>
   <table>
     <tr><th>Team member</th><th>Student ID</th><th>GitHub</th><th>Primary Lab 5 role</th></tr>
     <tr><td>Patiharn Liangkobkit</td><td>66070503489</td><td>@Richyboy170</td><td>CI, quality gates, release pipeline, evidence assembly</td></tr>
@@ -41,15 +52,19 @@
 
   <h2>Answer Part 1: CI and Quality Gate</h2>
   <h3>C-01: Meaningful passing PR check</h3>
-  <p>Release PR #18 ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832537856">44832537856</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
-  <p>Backend test summary: 32 tests passed across the Vitest/Supertest suite, with zero failures. The frontend build and Docker image build completed successfully.</p>
+  <p>Patiharn's feature PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/9">#9</a> ran <code>test-and-docker</code>. The check passed on workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/43851990563">43851990563</a>. It validates script syntax and offline deployment tests, Prisma/PostgreSQL setup and backend tests, frontend build, and the production Docker image.</p>
+  <p>The backend, frontend build, deployment-script checks, and Docker production build were successful.</p>
 
   <h3>C-02: Failing PR cannot merge</h3>
-  <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Workflow <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44832287247">44832287247</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
-  <p><strong>Figure 1-1.</strong> PR #17 reopened for evidence shows the failing <code>test-and-docker</code> check and the merge box blocked by the required check. The branch and PR were closed after the screenshot.</p>
-  <img src="evidence/patiharn/pr17-blocked.png" alt="PR 17 failed check and blocked merge" style="width:100%;border:1px solid #777;">
-  <p><strong>Figure 1-2.</strong> <code>protect-main</code> requires one approval and the <code>test-and-docker</code> status check. This setting prevented the failing temporary change from entering the release path.</p>
-  <img src="evidence/patiharn/protect-main-ruleset.png" alt="Protect main ruleset" style="width:100%;border:1px solid #777;">
+  <p>Temporary PR <a href="https://github.com/Richyboy170/Software-Engineering-Project/pull/17">#17</a> intentionally changed the smoke-test fixture to return an empty menu list. Reopened run <a href="https://github.com/Richyboy170/Software-Engineering-Project/actions/runs/44888190352">44888190352</a> produced <code>test-and-docker: FAILURE</code>. The PR was closed without merge and the temporary branch was deleted.</p>
+  <figure>
+    <img src="evidence/patiharn/pr17-blocked.png" alt="PR 17 failed check and blocked merge" style="width:100%;border:1px solid #b9c4d0;">
+    <figcaption><strong>Figure 1-1.</strong> PR #17 reopened for evidence shows the failing <code>test-and-docker</code> check and the merge box blocked by the required check. The branch and PR were closed after the screenshot.</figcaption>
+  </figure>
+  <figure>
+    <img src="evidence/patiharn/protect-main-ruleset.png" alt="Protect main ruleset" style="width:100%;border:1px solid #b9c4d0;">
+    <figcaption><strong>Figure 1-2.</strong> <code>protect-main</code> requires one approval and the <code>test-and-docker</code> status check.</figcaption>
+  </figure>
   <p>The repository ruleset <code>protect-sprint1-release</code> also protects staging and main. Ruleset <code>protect-main</code> requires one approval and the passing <code>test-and-docker</code> status check on <code>main</code>.</p>
 
   <h3>Patiharn contribution</h3>

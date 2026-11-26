@@ -1,6 +1,14 @@
 # Lab 6 Work Allocation
 
+**Submission deadline:** 29 November 2026
 **Status:** Approved allocation; implementation evidence pending.
+
+## Schedule targets
+
+- Partner UAT session: by 26 November 2026.
+- Partner retest and independent acceptance decision: by 27 November 2026.
+- The acceptance decision is a firm Lab 7 baseline dependency and cannot slip
+  to the 29 November submission deadline.
 
 ## Patiharn - Independent UAT Team
 

@@ -175,77 +175,86 @@ export class PrismaPersistence implements QuickOrderPersistence {
       quantities.set(item.menuItemId, (quantities.get(item.menuItemId) ?? 0) + item.quantity);
     }
 
-    try {
-      return await this.prisma.$transaction(async (tx) => {
-        const menuItems = await tx.menuItem.findMany({
-          where: { id: { in: [...quantities.keys()] } },
-        });
-        const menuItemsById = new Map(menuItems.map((item) => [item.id, item]));
-
-        for (const menuItemId of quantities.keys()) {
-          if (!menuItemsById.has(menuItemId)) {
-            return {
-              success: false as const,
-              code: "ITEM_NOT_FOUND",
-              message: `Menu item '${menuItemId}' does not exist.`,
-            };
-          }
-        }
-
-        for (const [menuItemId, quantity] of quantities) {
-          const menuItem = menuItemsById.get(menuItemId)!;
-          if (menuItem.stock < quantity) {
-            return {
-              success: false as const,
-              code: "INSUFFICIENT_STOCK",
-              message: new InsufficientStockError(menuItem.name, quantity, menuItem.stock).message,
-            };
-          }
-        }
-
-        for (const [menuItemId, quantity] of quantities) {
-          const reservation = await tx.menuItem.updateMany({
-            where: { id: menuItemId, stock: { gte: quantity } },
-            data: { stock: { decrement: quantity } },
+    for (let retry = 0; ; retry++) {
+      try {
+        return await this.prisma.$transaction(async (tx) => {
+          const menuItems = await tx.menuItem.findMany({
+            where: { id: { in: [...quantities.keys()] } },
           });
-          if (reservation.count !== 1) {
-            const menuItem = menuItemsById.get(menuItemId)!;
-            throw new InsufficientStockError(menuItem.name, quantity, menuItem.stock);
+          const menuItemsById = new Map(menuItems.map((item) => [item.id, item]));
+
+          for (const menuItemId of quantities.keys()) {
+            if (!menuItemsById.has(menuItemId)) {
+              return {
+                success: false as const,
+                code: "ITEM_NOT_FOUND",
+                message: `Menu item '${menuItemId}' does not exist.`,
+              };
+            }
           }
+
+          for (const [menuItemId, quantity] of quantities) {
+            const menuItem = menuItemsById.get(menuItemId)!;
+            if (menuItem.stock < quantity) {
+              return {
+                success: false as const,
+                code: "INSUFFICIENT_STOCK",
+                message: new InsufficientStockError(menuItem.name, quantity, menuItem.stock).message,
+              };
+            }
+          }
+
+          for (const [menuItemId, quantity] of quantities) {
+            const reservation = await tx.menuItem.updateMany({
+              where: { id: menuItemId, stock: { gte: quantity } },
+              data: { stock: { decrement: quantity } },
+            });
+            if (reservation.count !== 1) {
+              const menuItem = menuItemsById.get(menuItemId)!;
+              throw new InsufficientStockError(menuItem.name, quantity, menuItem.stock);
+            }
+          }
+
+          let totalPrice = new Prisma.Decimal(0);
+          const orderItems = items.map((item) => {
+            const menuItem = menuItemsById.get(item.menuItemId)!;
+            const subtotal = menuItem.price.mul(item.quantity);
+            totalPrice = totalPrice.add(subtotal);
+            return {
+              menuItemId: menuItem.id,
+              name: menuItem.name,
+              quantity: item.quantity,
+              unitPrice: menuItem.price,
+              subtotal,
+            };
+          });
+
+          const order = await tx.order.create({
+            data: {
+              orderNumber: `QO-${randomBytes(12).toString("hex").toUpperCase()}`,
+              pickupCode: await generateUniquePickupCode(tx),
+              customerId,
+              totalPrice,
+              items: { create: orderItems },
+            },
+            include: { items: true },
+          });
+
+          return { success: true as const, order: mapOrder(order) };
+        });
+      } catch (error) {
+        if (error instanceof InsufficientStockError) {
+          return { success: false, code: "INSUFFICIENT_STOCK", message: error.message };
         }
-
-        let totalPrice = new Prisma.Decimal(0);
-        const orderItems = items.map((item) => {
-          const menuItem = menuItemsById.get(item.menuItemId)!;
-          const subtotal = menuItem.price.mul(item.quantity);
-          totalPrice = totalPrice.add(subtotal);
-          return {
-            menuItemId: menuItem.id,
-            name: menuItem.name,
-            quantity: item.quantity,
-            unitPrice: menuItem.price,
-            subtotal,
-          };
-        });
-
-        const order = await tx.order.create({
-          data: {
-            orderNumber: `QO-${randomBytes(12).toString("hex").toUpperCase()}`,
-            pickupCode: await generateUniquePickupCode(tx),
-            customerId,
-            totalPrice,
-            items: { create: orderItems },
-          },
-          include: { items: true },
-        });
-
-        return { success: true as const, order: mapOrder(order) };
-      });
-    } catch (error) {
-      if (error instanceof InsufficientStockError) {
-        return { success: false, code: "INSUFFICIENT_STOCK", message: error.message };
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002" &&
+          retry < 2
+        ) {
+          continue;
+        }
+        throw error;
       }
-      throw error;
     }
   }
 

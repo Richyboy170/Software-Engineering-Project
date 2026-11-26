@@ -10,13 +10,15 @@ describe("Feature F-01: Authentication & Health Checks", () => {
     resetLoginRateLimitForTests();
   });
 
-  describe("GET /api/health", () => {
+  describe("TEST-F11-03: Security response headers", () => {
     it("returns 200 with status ok and service name", async () => {
       const res = await request(app).get("/api/health");
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ status: "ok", service: "QuickOrder API" });
       expect(res.headers["x-request-id"]).toBeDefined();
       expect(res.headers["x-content-type-options"]).toBe("nosniff");
+      expect(res.headers["x-frame-options"]).toBe("DENY");
+      expect(res.headers["referrer-policy"]).toBe("no-referrer");
     });
   });
 
@@ -85,6 +87,25 @@ describe("Feature F-01: Authentication & Health Checks", () => {
       expect(blocked.status).toBe(429);
       expect(blocked.body.error.code).toBe("TOO_MANY_ATTEMPTS");
       expect(blocked.headers["retry-after"]).toBeDefined();
+    });
+
+    it("TEST-F11-02: clears the failed-login counter after successful login", async () => {
+      const login = (password: string) =>
+        request(app)
+          .post("/api/auth/login")
+          .send({ email: "customer@quickorder.local", password });
+
+      for (let attempt = 0; attempt < 4; attempt++) {
+        expect((await login("WrongPassword!")).status).toBe(401);
+      }
+
+      expect((await login("Password123!")).status).toBe(200);
+
+      for (let attempt = 0; attempt < 5; attempt++) {
+        expect((await login("WrongPassword!")).status).toBe(401);
+      }
+
+      expect((await login("WrongPassword!")).status).toBe(429);
     });
   });
 

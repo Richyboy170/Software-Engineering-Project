@@ -27,7 +27,18 @@ Tests:
 - `TEST-RECEIPT-01`: owner receipt and stable four-character pickup code.
 - `TEST-RECEIPT-02`: cross-customer receipt returns 403.
 - `TEST-F11-01`: repeated invalid login attempts return 429.
-- Request-ID and security-header test is included in the authentication suite.
+- `TEST-F11-02`: successful login clears prior failed-login attempts.
+- `TEST-F11-03`: request ID and all three required security headers are present.
+- Prisma order creation retries bounded `P2002` unique conflicts.
+
+## Sequencing Disclosure
+
+F-08 and F-11 contracts were added in commit
+[`1986b1e`](https://github.com/Richyboy170/Software-Engineering-Project/commit/1986b1ed0be85b2ae0a10083d691e93172931fa0),
+the same commit as their implementation. There is no earlier contract-only
+commit or recorded red/green evidence. This does not meet D2 Section 3.2's
+contract-before-implementation sequence; the record is disclosed, not
+rewritten.
 
 ## F-11 Sprint 3 Progress
 
@@ -63,3 +74,13 @@ Issue #23 is the independent-UAT packet. Patiharn has prepared truthful executio
 - Submit reproducible findings and closure/retest records.
 - Complete a final Lab 6 PDF after the partner acceptance decision exists.
 - Complete final Deliverable 2 PDF assembly after Tanakrit-owned F-07/F-09/Sprint 3 work and the integrated candidate are known.
+
+## Merge Gate and Known Limitations
+
+- Do not merge the auto-deploying PR to `main` until the Lab 6 partner retest
+  and acceptance are recorded (target: 27 November 2026). Any Lab 6 fix release
+  must remain Sprint 1 only. This PR changes Sprint 1 behavior through the
+  five-failure login 429, pickup-code migration and new response headers.
+- The login limiter is in-memory and keyed by request IP plus normalized
+  email. Repeated failures from the same IP can lock out an account, and
+  counters are not shared across Cloud Run instances or process restarts.

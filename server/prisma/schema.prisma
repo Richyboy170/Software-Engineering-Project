@@ -62,6 +62,7 @@ model MenuItem {
 model Order {
   id          String      @id @default(cuid())
   orderNumber String      @unique @db.VarChar(30)
+  pickupCode  String      @unique @db.VarChar(4)
   customerId  String
   status      OrderStatus @default(PENDING)
   totalPrice  Decimal     @db.Decimal(10, 2)

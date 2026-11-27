@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
+import { randomUUID } from "node:crypto";
 import { createAuthRouter } from "./routes/auth.routes.js";
 import { createMenuRouter } from "./routes/menu.routes.js";
 import { createOrderRouter } from "./routes/order.routes.js";
@@ -11,6 +12,23 @@ import { asyncHandler } from "./http/async-handler.js";
 
 export function createApp(persistence: QuickOrderPersistence): express.Express {
   const app = express();
+
+  app.use((req, res, next) => {
+    const requestId = randomUUID();
+    res.setHeader("X-Request-ID", requestId);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "no-referrer");
+    res.on("finish", () => {
+      console.log(JSON.stringify({
+        requestId,
+        method: req.method,
+        path: req.path,
+        status: res.statusCode,
+      }));
+    });
+    next();
+  });
 
   app.use(cors());
   app.use(express.json());

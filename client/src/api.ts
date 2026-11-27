@@ -14,6 +14,23 @@ function getHeaders(): Record<string, string> {
 }
 
 export const api = {
+  async getReceipt(orderId: string): Promise<{
+    pickupCode: string;
+    orderNumber: string;
+    status: OrderStatus;
+    totalPrice: number;
+    items: Order["items"];
+    createdAt: string;
+  }> {
+    const res = await fetch(`${API_BASE}/api/orders/${orderId}/receipt`, {
+      headers: getHeaders(),
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.error?.message || "Failed to load receipt");
+    }
+    return json.data;
+  },
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",

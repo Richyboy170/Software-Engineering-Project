@@ -47,6 +47,7 @@ describe("Features F-02, F-03, F-05: Menu, Order Creation & Business Rules", () 
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
       expect(res.body.data.status).toBe("PENDING");
+      expect(res.body.data.pickupCode).toMatch(/^[A-Z2-9]{4}$/);
       // 149.00 * 2 = 298.00
       expect(res.body.data.totalPrice).toBe(298);
       expect(res.body.data.items).toHaveLength(1);
@@ -55,6 +56,28 @@ describe("Features F-02, F-03, F-05: Menu, Order Creation & Business Rules", () 
       // Verify stock in database was decremented
       const updatedStock = store.getMenuItem("menu_01")!.stock;
       expect(updatedStock).toBe(initialStock - 2);
+    });
+  });
+
+  describe("TEST-RECEIPT-01 / F-08 Digital Receipt and Pickup Code", () => {
+    it("returns an owner-only receipt with a stable four-character pickup code", async () => {
+      const createRes = await request(app)
+        .post("/api/orders")
+        .set("Authorization", `Bearer ${customerToken}`)
+        .send({ items: [{ menuItemId: "menu_01", quantity: 1 }] });
+
+      expect(createRes.status).toBe(201);
+      const order = createRes.body.data;
+      expect(order.pickupCode).toMatch(/^[A-Z2-9]{4}$/);
+
+      const receiptRes = await request(app)
+        .get(`/api/orders/${order.id}/receipt`)
+        .set("Authorization", `Bearer ${customerToken}`);
+
+      expect(receiptRes.status).toBe(200);
+      expect(receiptRes.body.data.pickupCode).toBe(order.pickupCode);
+      expect(receiptRes.body.data.orderNumber).toBe(order.orderNumber);
+      expect(receiptRes.body.data.totalPrice).toBe(149);
     });
   });
 

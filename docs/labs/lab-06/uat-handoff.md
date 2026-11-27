@@ -1,8 +1,8 @@
 # Lab 6 — QuickOrder Sprint 1 UAT Handoff
 
 **Product Team:** QuickOrder — Patiharn Liangkobkit (66070503489), Tanakrit Sunthonwetchapong (67070503464)
-**UAT Team:** `<partner team name, members, IDs>`
-**Handoff version:** v1.0 — `<date/time sent>`
+**UAT Team:** Slop Software — 67070503459, 67070503467
+**Handoff version:** v1.0 — 27 Nov 2026 7:00 AM time sent
 
 ---
 
